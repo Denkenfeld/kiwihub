@@ -289,6 +289,35 @@
     <!-- CANVAS für Kiwi Shader -->
     <canvas id="bg-canvas"></canvas>
 
+    <!-- CANVAS für Kiwi Shader -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Grüne animierte Welle oben und unten an der Kante -->
+    <svg id="wave-svg" viewBox="0 0 1920 150" width="100%" height="150px" style="position: fixed; top: calc(55% - 75px); left: 0; z-index: 2; pointer-events: none; overflow: visible; preserveAspectRatio: none;">
+        <defs>
+            <style>
+                @keyframes wave {
+                    0% { 
+                        d: path('M0,75 Q240,50 480,75 T960,75 T1440,75 T1920,75 L1920,100 Q1440,125 960,100 Q480,125 0,100 Z');
+                    }
+                    25% { 
+                        d: path('M0,70 Q240,45 480,70 T960,70 T1440,70 T1920,70 L1920,105 Q1440,130 960,105 Q480,130 0,105 Z');
+                    }
+                    50% { 
+                        d: path('M0,75 Q240,50 480,75 T960,75 T1440,75 T1920,75 L1920,100 Q1440,125 960,100 Q480,125 0,100 Z');
+                    }
+                    75% { 
+                        d: path('M0,80 Q240,55 480,80 T960,80 T1440,80 T1920,80 L1920,95 Q1440,120 960,95 Q480,120 0,95 Z');
+                    }
+                    100% { 
+                        d: path('M0,75 Q240,50 480,75 T960,75 T1440,75 T1920,75 L1920,100 Q1440,125 960,100 Q480,125 0,100 Z');
+                    }
+                }
+            </style>
+        </defs>
+        <path id="wave-path" d="M0,75 Q240,50 480,75 T960,75 T1440,75 T1920,75 L1920,100 Q1440,125 960,100 Q480,125 0,100 Z" fill="#84cc16" opacity="0.65" style="animation: wave 5s ease-in-out infinite;" />
+    </svg>
+
     <!-- KIWI SLICE HEADER DEKORATION -->
     <div class="fixed top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-5">
         <div class="kiwi-slice-header"></div>
@@ -335,40 +364,36 @@
         </nav>
 
         <!-- HEADER mit Kiwi-Metapher -->
-        <header class="relative py-32 lg:py-48 flex items-center justify-center text-center px-4 sm:px-6 lg:px-8 w-full overflow-hidden">
-            <div class="max-w-4xl mx-auto pointer-events-auto relative z-20">
-                <span class="inline-flex items-center gap-1.5 py-2 px-5 rounded-full text-xs font-extrabold bg-gradient-to-r from-lime-100 to-emerald-100 text-lime-700 border border-lime-300 mb-8 backdrop-blur-sm animate-pulse shadow-lg shadow-lime-400/20">
-                    <i data-lucide="sprout" class="w-4 h-4"></i> 🥝 EUROPAS FRISCHESTE KI-INNOVATION
+        <header class="relative py-12 lg:py-20 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 w-full overflow-hidden">
+            <div class="max-w-4xl mx-auto pointer-events-auto relative z-20 bg-white/50 p-10 sm:p-14 rounded-2xl border-2 border-slate-200/80 shadow-lg mb-16">
+                <span class="inline-flex items-center gap-2 py-3 px-6 rounded-full text-sm font-black bg-gradient-to-r from-lime-100 to-emerald-100 text-lime-700 border border-lime-300 mb-8 backdrop-blur-sm animate-pulse shadow-lg shadow-lime-400/20">
+                    🥝 kiwihub: Europas KI-Ökosystem
                 </span>
                 
                 <h1 class="text-6xl sm:text-8xl font-black tracking-tight text-slate-900 leading-none mb-6">
-                    <span class="block">Europas</span>
-                    <span class="gradient-text-animated">schärfste KI</span>
-                    <span class="block">Innovation.</span>
+                    Campus × <span class="gradient-text-animated">Industrie</span>
                 </h1>
                 
-                <p class="text-2xl sm:text-3xl font-bold mb-8 leading-snug">
-                    <span class="text-slate-700">Wo akademische Exzellenz auf</span><br/>
-                    <span class="kiwi-highlight">echte Industrie-Challenges</span> <span class="text-slate-700">trifft</span>
+                <p class="text-2xl sm:text-3xl font-bold mb-8 leading-snug text-slate-900">
+                    Wo Ideen auf Herausforderungen treffen, entsteht Innovation.
                 </p>
 
-                <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed mb-8">
-                    🥝 <span class="font-bold">Von außen grün, von innen voller Potenzial:</span> Verbinde dich mit Europas besten Köpfen. Kleine Seeds werden hier zu großen Innovationen. Nicht reden – schneiden und handeln.
+                <p class="text-lg sm:text-xl text-slate-700 font-medium leading-relaxed mb-10">
+                    Jede Innovation beginnt mit einem Seed. Studierende bringen Ideen. Unternehmen bringen Herausforderungen. Gemeinsam lassen wir daraus die Lösungen von morgen wachsen.
                 </p>
 
-                <div class="mt-12 flex flex-wrap justify-center gap-4">
+                <div class="flex flex-wrap justify-center sm:justify-start gap-4">
                     <a href="#discover" class="bg-gradient-to-r from-lime-400 to-emerald-500 hover:from-lime-300 hover:to-emerald-400 text-slate-900 font-black px-8 py-4 rounded-xl transition duration-300 transform hover:-translate-y-1 shadow-lg shadow-emerald-400/30 hover:shadow-emerald-400/50 flex items-center gap-2 group text-lg">
-                        <i data-lucide="knife" class="w-5 h-5 group-hover:rotate-45 transition-transform"></i>
+                        <i data-lucide="scissors" class="w-5 h-5 group-hover:rotate-45 transition-transform"></i>
                         Öffne die Seeds
                     </a>
                     <a href="#" class="bg-white/70 hover:bg-white/90 text-slate-900 font-bold px-8 py-4 rounded-xl border-2 border-slate-300 backdrop-blur-sm transition duration-300 text-lg">
                         Challenge stellen
                     </a>
                 </div>
+            </div>
 
-                <div class="mt-16 text-xs text-lime-600/70 tracking-widest uppercase font-mono hidden sm:block animate-pulse">
-                    ↑ Bewege deine Maus – schneide durch die Kiwi-Innovation ↑
-                </div>
+
 
                 <!-- KPI Cards mit Seed-Metapher -->
                 <div class="mt-28 grid grid-cols-2 md:grid-cols-4 gap-6 border-t-2 border-slate-200/40 pt-16 max-w-5xl mx-auto backdrop-blur-xs">
@@ -495,8 +520,8 @@
                     </div>
 
                     <!-- PROJEKT 2 -->
-                    <div class="project-card bg-white/60 border-2 border-slate-200/80 rounded-2xl overflow-hidden shadow-md">
-                        <img src="https://images.unsplash.com/photo-1576091160550-112173faf246?w=800&q=80" alt="Medical AI" class="project-image">
+                    <div class="project-card bg-white/60 border-2 border-slate-200/80 rounded-2xl hover:border-lime-400/50 transition-all duration-300 hover:shadow-md overflow-hidden group kiwi-glow">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80" alt="Medical AI" class="project-image">
                         <div class="p-7">
                             <div class="flex flex-col md:flex-row justify-between gap-6">
                                 <div class="space-y-4 min-w-0 flex-grow">
@@ -532,7 +557,7 @@
                     </div>
 
                     <!-- PROJEKT 3 -->
-                    <div class="project-card bg-white/60 border-2 border-slate-200/80 rounded-2xl overflow-hidden shadow-md">
+                    <div class="project-card bg-white/60 border-2 border-slate-200/80 rounded-2xl hover:border-lime-400/50 transition-all duration-300 hover:shadow-md overflow-hidden group kiwi-glow">
                         <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" alt="Robotics" class="project-image">
                         <div class="p-7">
                             <div class="flex flex-col md:flex-row justify-between gap-6">
