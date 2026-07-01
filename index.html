@@ -32,6 +32,43 @@
             filter: drop-shadow(0 30px 50px rgba(132, 204, 22, 0.2));
         }
 
+        /* HERO CTA BUTTONS */
+        .hero-cta-bg {
+            background: linear-gradient(120deg, #bfef45 0%, #84cc16 45%, #22c55e 100%);
+            background-size: 200% 200%;
+            animation: heroGradientShift 4s ease-in-out infinite;
+            z-index: 0;
+        }
+        @keyframes heroGradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .hero-cta-btn {
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .hero-cta-icon {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .hero-cta-btn:hover .hero-cta-icon {
+            transform: rotate(-12deg) scale(1.15);
+        }
+        .hero-cta-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
+            transform: translateX(-100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .hero-cta-btn:hover::after {
+            animation: heroShine 0.9s ease;
+        }
+        @keyframes heroShine {
+            to { transform: translateX(100%); }
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -337,7 +374,7 @@
     <div class="relative z-10 flex flex-col min-h-screen pointer-events-none w-full">
 
         <!-- NAVIGATION -->
-        <nav class="border-b border-slate-200/60 bg-white/70 backdrop-blur-md sticky top-0 z-50 pointer-events-auto w-full shadow-sm">
+        <nav id="main-nav" class="border-b border-slate-200/60 bg-white/70 backdrop-blur-md fixed top-0 left-0 z-50 pointer-events-auto w-full shadow-sm transition-transform duration-300 ease-in-out">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2 cursor-pointer group">
                     <div class="bg-gradient-to-br from-lime-400 to-emerald-500 text-slate-900 p-2 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-emerald-400/30 group-hover:shadow-emerald-400/60 transition-all duration-300">kiwi</div>
@@ -367,10 +404,11 @@
                 </div>
             </div>
         </nav>
+        <div id="nav-spacer"></div>
 
         <!-- HEADER mit Kiwi-Metapher -->
         <header class="relative py-12 lg:py-20 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 w-full overflow-hidden">
-            <div class="max-w-4xl mx-auto pointer-events-auto relative z-20 bg-white/50 p-10 sm:p-14 rounded-2xl border-2 border-slate-200/80 shadow-lg mb-16">
+            <div class="max-w-4xl mx-auto pointer-events-auto relative z-20 bg-white/50 p-10 sm:p-14 rounded-2xl border-2 border-slate-200/80 shadow-lg mb-16" style="transform: translateY(-35px);">
                 <span class="inline-flex items-center gap-2 py-3 px-6 rounded-full text-sm font-black bg-gradient-to-r from-lime-100 to-emerald-100 text-lime-700 border border-lime-300 mb-8 backdrop-blur-sm animate-pulse shadow-lg shadow-lime-400/20">
                     🥝 kiwihub: Europaweites KI-Ökosystem
                 </span>
@@ -386,6 +424,19 @@
                 <p class="text-lg sm:text-xl text-slate-700 font-medium leading-relaxed mb-10">
                     Jede Innovation beginnt mit einem Seed. Studierende bringen Ideen. Unternehmen bringen Herausforderungen. Gemeinsam lassen wir daraus die Lösungen von morgen wachsen.
                 </p>
+
+                <div class="flex flex-row items-center justify-center gap-2 sm:gap-4 w-full px-2">
+                    <a href="#" class="hero-cta-btn group relative inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 sm:gap-2.5 overflow-hidden rounded-full px-3 sm:px-8 py-2.5 sm:py-4 font-black text-xs sm:text-lg text-slate-900 shadow-lg shadow-emerald-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-400/50 hover:-translate-y-0.5 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap">
+                        <span class="hero-cta-bg absolute inset-0"></span>
+                        <i data-lucide="sparkles" class="relative z-10 w-3.5 h-3.5 sm:w-5 sm:h-5 hero-cta-icon shrink-0"></i>
+                        <span class="relative z-10">Seeds entdecken</span>
+                    </a>
+                    <a href="#" class="hero-cta-btn group relative inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 sm:gap-2.5 overflow-hidden rounded-full px-3 sm:px-8 py-2.5 sm:py-4 font-black text-xs sm:text-lg text-slate-900 shadow-lg shadow-emerald-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-400/50 hover:-translate-y-0.5 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap">
+                        <span class="hero-cta-bg absolute inset-0"></span>
+                        <i data-lucide="sprout" class="relative z-10 w-3.5 h-3.5 sm:w-5 sm:h-5 hero-cta-icon shrink-0"></i>
+                        <span class="relative z-10">Jetzt mitwachsen</span>
+                    </a>
+                </div>
 
             </div>
 
@@ -521,7 +572,7 @@
                 </aside>
 
                 <!-- PROJECTS SECTION -->
-                <section class="flex-grow min-w-0 space-y-8">
+                <section id="projects-section" class="flex-grow min-w-0 space-y-8">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-slate-200/60">
                         <p class="text-base text-slate-600 font-bold">
                             🌱 <span class="text-slate-900 font-black">3 Power-Seeds</span> bereit zu sprießen
@@ -883,5 +934,37 @@
         });
     </script>
     <script>lucide.createIcons();</script>
+
+    <script>
+        (function () {
+            const nav = document.getElementById('main-nav');
+            const spacer = document.getElementById('nav-spacer');
+            const projectsSection = document.getElementById('projects-section');
+            if (!nav || !spacer || !projectsSection) return;
+
+            const syncSpacerHeight = () => {
+                spacer.style.height = nav.offsetHeight + 'px';
+            };
+
+            const update = () => {
+                const navH = nav.offsetHeight;
+                const triggerPoint = projectsSection.getBoundingClientRect().top + window.scrollY - navH;
+                if (window.scrollY >= triggerPoint) {
+                    nav.style.transform = `translateY(-${navH}px)`;
+                } else {
+                    nav.style.transform = 'translateY(0)';
+                }
+            };
+
+            syncSpacerHeight();
+            update();
+
+            window.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', () => {
+                syncSpacerHeight();
+                update();
+            });
+        })();
+    </script>
 </body>
 </html>
