@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiwiHub | Europas KI-Innovationsökosystem</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    :root{
+        --kiwi-50:#f5fbe8;
+        --kiwi-400:#8fd332;
+        --kiwi-500:#7cc016;
+        --kiwi-600:#5fa012;
+        --emerald-500:#22b56b;
+        --ink:#10151a;
+        --paper:#fafaf8;
+        --line:#e7e5df;
+    }
+
+    html{ scroll-behavior:smooth; overflow-x:hidden; }
+    body{
+        font-family:'Inter',sans-serif;
+        background-color:var(--paper);
+        color:var(--ink);
+        overflow-x:hidden;
+    }
+
+    ::-webkit-scrollbar{ width:9px; }
+    ::-webkit-scrollbar-track{ background:var(--paper); }
+    ::-webkit-scrollbar-thumb{ background:linear-gradient(to bottom,var(--kiwi-500),var(--emerald-500)); border-radius:5px; }
+
+    /* ---------- Ambient Background (ruhig, dezent) ---------- */
+    .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    }
+    .ambient .blob{
+        position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+        animation:driftBlob 26s ease-in-out infinite;
+    }
+    .ambient .blob-1{ width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle at 30% 30%, var(--kiwi-400), transparent 70%); }
+    .ambient .blob-2{ width:460px; height:460px; top:-60px; right:-160px; background:radial-gradient(circle at 60% 40%, var(--emerald-500), transparent 70%); animation-delay:-8s; }
+    .ambient .blob-3{ width:380px; height:380px; top:260px; left:35%; background:radial-gradient(circle, var(--kiwi-500), transparent 70%); opacity:.16; animation-delay:-16s; }
+    @keyframes driftBlob{
+        0%,100%{ transform:translate(0,0) scale(1); }
+        50%{ transform:translate(24px,30px) scale(1.06); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .ambient .blob{ animation:none; }
+    }
+
+    /* ---------- Reveal on scroll ---------- */
+    .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+    /* ---------- Gradient text ---------- */
+    .grad-text{
+        background:linear-gradient(100deg, var(--kiwi-600), var(--emerald-500));
+        -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    /* ---------- Glass cards ---------- */
+    .glass-card{
+        background:rgba(255,255,255,.66);
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
+        border:1px solid var(--line);
+        transition:transform .35s cubic-bezier(.22,1,.36,1), border-color .35s ease, box-shadow .35s ease;
+    }
+    .glass-card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(124,192,22,.55);
+        box-shadow:0 20px 40px -20px rgba(34,181,107,.35);
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn-primary{
+        background:linear-gradient(100deg, var(--kiwi-400), var(--emerald-500));
+        color:#0d1a0a;
+        transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease;
+    }
+    .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 16px 30px -12px rgba(34,181,107,.5); }
+    .btn-secondary{
+        border:1.5px solid var(--line);
+        transition:border-color .3s ease, background .3s ease, transform .3s ease;
+    }
+    .btn-secondary:hover{ border-color:var(--kiwi-500); background:rgba(124,192,22,.06); transform:translateY(-2px); }
+
+    /* ---------- Flow diagram (Signature-Element) ---------- */
+    .flow-track{ position:relative; }
+    .flow-node{
+        display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem;
+        min-width:132px;
+    }
+    .flow-icon{
+        width:58px; height:58px; border-radius:9999px;
+        display:flex; align-items:center; justify-content:center;
+        background:#fff; border:2.5px solid var(--line);
+        box-shadow:0 4px 14px -8px rgba(16,21,26,.18);
+        position:relative; z-index:2;
+    }
+    .flow-icon svg{ width:22px; height:22px; stroke:var(--kiwi-600); stroke-width:1.75; }
+    .flow-icon-lg{ width:72px; height:72px; }
+    .flow-icon-lg svg{ width:28px; height:28px; stroke:var(--kiwi-600); stroke-width:1.6; }
+    .flow-node.highlight .flow-icon{
+        border-color:var(--kiwi-500);
+        border-width:3px;
+        box-shadow:0 0 0 4px rgba(124,192,22,.14), 0 8px 20px -10px rgba(34,181,107,.4);
+    }
+    .flow-arrow{ flex:1; min-width:28px; height:2px; position:relative; align-self:center; margin-top:-28px; }
+    .flow-arrow svg{ width:100%; height:16px; overflow:visible; display:block; }
+    .flow-dash{ stroke-dasharray:6 6; animation:dashMove 1.6s linear infinite; }
+    @keyframes dashMove{ to{ stroke-dashoffset:-24; } }
+
+    .flow-arrow-v{
+        width:2px; height:26px;
+        background:repeating-linear-gradient(to bottom, #7cc016 0 4px, transparent 4px 8px);
+        animation:dashMoveV 1s linear infinite;
+    }
+    @keyframes dashMoveV{ to{ background-position:0 -8px; } }
+
+    /* ---------- Kreis-Layout "So funktioniert KiwiHub" ---------- */
+    .circle-flow{
+        position:relative;
+        width:100%;
+        max-width:460px;
+        aspect-ratio:1/1;
+    }
+    .circle-track{ position:absolute; inset:0; width:100%; height:100%; }
+    #circle-lines .flow-line{
+        fill:none; stroke:var(--kiwi-500); stroke-linecap:round;
+        stroke-dasharray:9 12; opacity:.65;
+        animation:circleFlow 11s linear infinite;
+    }
+    @keyframes circleFlow{ to{ stroke-dashoffset:-480; } }
+
+    .circle-center{
+        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        width:172px; height:172px; border-radius:9999px;
+        display:flex; align-items:center; justify-content:center;
+        overflow:hidden;
+        background:#f3fadf;
+        box-shadow:0 10px 24px -10px rgba(95,160,18,.35), inset 0 0 0 1px rgba(124,192,22,.15);
+    }
+    .center-blob{
+        position:absolute;
+        opacity:.72;
+        mix-blend-mode:multiply;
+        filter:blur(1px);
+    }
+    .blob-x{
+        width:130%; height:130%; top:-22%; left:-18%;
+        background:radial-gradient(circle at 35% 35%, rgba(191,232,106,.9), rgba(191,232,106,0) 70%);
+        border-radius:58% 42% 39% 61% / 55% 40% 60% 45%;
+        animation:blobMorphX 13s ease-in-out infinite;
+    }
+    .blob-y{
+        width:120%; height:120%; bottom:-20%; right:-16%;
+        background:radial-gradient(circle at 65% 65%, rgba(34,181,107,.75), rgba(34,181,107,0) 70%);
+        border-radius:42% 58% 63% 37% / 46% 62% 38% 54%;
+        animation:blobMorphY 16s ease-in-out infinite;
+    }
+    .blob-z{
+        width:95%; height:95%; top:8%; left:12%;
+        background:radial-gradient(circle at 50% 40%, rgba(124,192,22,.6), rgba(124,192,22,0) 72%);
+        border-radius:50% 50% 40% 60% / 60% 45% 55% 40%;
+        animation:blobMorphZ 19s ease-in-out infinite;
+    }
+    @keyframes blobMorphX{
+        0%,100%{ transform:translate(0,0) rotate(0deg) scale(1); border-radius:58% 42% 39% 61% / 55% 40% 60% 45%; }
+        50%{ transform:translate(6%,5%) rotate(12deg) scale(1.06); border-radius:45% 55% 60% 40% / 40% 55% 45% 60%; }
+    }
+    @keyframes blobMorphY{
+        0%,100%{ transform:translate(0,0) rotate(0deg) scale(1); border-radius:42% 58% 63% 37% / 46% 62% 38% 54%; }
+        50%{ transform:translate(-5%,-6%) rotate(-10deg) scale(1.08); border-radius:60% 40% 45% 55% / 58% 42% 60% 40%; }
+    }
+    @keyframes blobMorphZ{
+        0%,100%{ transform:translate(0,0) scale(1); border-radius:50% 50% 40% 60% / 60% 45% 55% 40%; }
+        50%{ transform:translate(4%,-4%) scale(0.94); border-radius:40% 60% 55% 45% / 45% 60% 40% 55%; }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .center-blob{ animation:none; }
+    }
+    .circle-center-text{
+        position:relative; z-index:2; color:#2f4a12; font-weight:800; text-align:center;
+        font-size:.78rem; line-height:1.25; letter-spacing:.01em; padding:0 26px;
+    }
+    .circle-node{
+        position:absolute; transform:translate(-50%,-50%);
+        display:flex; flex-direction:column; align-items:center; gap:.4rem;
+        width:112px;
+    }
+    @media (prefers-reduced-motion: reduce){
+        #circle-lines .flow-line{ animation:none; }
+    }
+
+    /* ---------- Timeline ---------- */
+    .timeline-dot{
+        width:14px; height:14px; border-radius:9999px;
+        background:linear-gradient(135deg,var(--kiwi-500),var(--emerald-500));
+        box-shadow:0 0 0 5px rgba(124,192,22,.15);
+    }
+
+    .kicker{
+        font-size:.72rem; letter-spacing:.16em; font-weight:700; text-transform:uppercase; color:var(--kiwi-600);
+    }
+</style>
+</head>
+<body class="antialiased selection:bg-lime-300 selection:text-slate-900">
+
+<div class="ambient">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<div class="relative z-10 flex flex-col min-h-screen w-full">
+
+    <!-- TRUST BAR -->
+    <div class="w-full bg-[#101c12] text-white/90 text-xs sm:text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center">
+            <span class="font-semibold">In Gründung – gemeinsam mit einem Lehrstuhl der Uni</span>
+            <span class="hidden sm:inline text-white/30">•</span>
+            <span class="text-white/70">Erste Industriepartner gesucht</span>
+        </div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="border-b border-slate-200/70 bg-white/75 backdrop-blur-md sticky top-0 z-50 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+                <span class="bg-gradient-to-br from-lime-400 to-emerald-500 text-[#0d1a0a] px-2.5 py-1 rounded-lg font-black text-base tracking-tight shadow-md shadow-emerald-400/25">kiwi</span>
+                <span class="text-base font-black tracking-tight text-slate-900 pl-1.5">hub</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#funktion" class="hover:text-slate-900 transition-colors">So funktioniert's</a>
+                <a href="#warum" class="hover:text-slate-900 transition-colors">Warum KiwiHub</a>
+                <a href="#zielgruppen" class="hover:text-slate-900 transition-colors">Für wen</a>
+                <a href="#vision" class="hover:text-slate-900 transition-colors">Vision</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="hidden sm:inline text-sm font-semibold text-slate-600 hover:text-slate-900 transition">Anmelden</button>
+                <a href="#cta" class="btn-primary text-sm font-bold px-4 sm:px-5 py-2.5 rounded-lg">Challenge starten</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="relative px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-28 sm:pb-24 flex flex-col items-center text-center w-full overflow-hidden">
+        <canvas id="flow-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+        <div class="absolute inset-0 z-0 pointer-events-none" style="background:radial-gradient(ellipse 52% 40% at 50% 36%, rgba(250,250,248,0.62) 0%, rgba(250,250,248,0) 72%);"></div>
+
+        <span class="relative z-10 inline-flex items-center gap-2 py-2 px-4 rounded-full text-xs sm:text-sm font-bold bg-white border border-lime-300 text-lime-700 mb-8 shadow-sm reveal is-visible">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Europas KI-Innovationsökosystem
+        </span>
+
+        <h1 class="relative z-10 max-w-4xl text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-slate-900 mb-7 reveal is-visible">
+            Lösen Sie Ihre nächste <span class="grad-text">Innovationsfrage</span> mit Europas Hochschulen.
+        </h1>
+
+        <p class="relative z-10 max-w-2xl text-lg sm:text-xl text-slate-600 font-medium leading-relaxed mb-10 reveal is-visible">
+            Unternehmen bringen reale Herausforderungen. Hochschulen integrieren sie in Seminare.
+            Studierende entwickeln mit modernster KI die Lösungen von morgen.
+        </p>
+
+        <div class="relative z-10 flex flex-col sm:flex-row items-center gap-4 mb-20 reveal is-visible">
+            <a href="#cta" class="btn-primary font-bold text-base px-7 py-3.5 rounded-xl inline-flex items-center gap-2">
+                Challenge starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#funktion" class="btn-secondary font-bold text-base px-7 py-3.5 rounded-xl text-slate-700 bg-white/70">
+                So funktioniert KiwiHub
+            </a>
+        </div>
+    </header>
+
+    <!-- SO FUNKTIONIERT KIWIHUB -->
+    <section id="funktion" class="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-white/70 border-y border-slate-200/70">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Der Ablauf</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">So funktioniert KiwiHub</h2>
+            </div>
+
+            <!-- KREISLAUF – Desktop/Tablet -->
+            <div class="hidden md:block reveal">
+                <div class="circle-flow mx-auto">
+                    <svg viewBox="0 0 400 400" class="circle-track">
+                        <circle cx="200" cy="200" r="170" fill="none" stroke="#dbe7c9" stroke-width="2.5"/>
+                    </svg>
+                    <svg viewBox="0 0 400 400" class="circle-track" id="circle-lines"></svg>
+
+                    <div class="circle-center">
+                        <div class="center-blob blob-x"></div>
+                        <div class="center-blob blob-y"></div>
+                        <div class="center-blob blob-z"></div>
+                        <p class="circle-center-text">Kiwi Ökosystem<br>für KI-Innovationen</p>
+                    </div>
+
+                    <div class="circle-node" style="left:50%; top:8%;">
+                        <div class="flow-icon flow-icon-lg"><i data-lucide="factory"></i></div><p class="text-sm sm:text-base font-black text-slate-900">Unternehmen</p>
+                    </div>
+                    <div class="circle-node" style="left:79.7%; top:20.3%;">
+                        <div class="flow-icon"><i data-lucide="target"></i></div><p class="text-xs sm:text-sm font-bold text-slate-800">Challenge</p>
+                    </div>
+                    <div class="circle-node" style="left:92%; top:50%;">
+                        <div class="flow-icon flow-icon-lg"><i data-lucide="graduation-cap"></i></div><p class="text-sm sm:text-base font-black text-slate-900">Hochschulen</p>
+                    </div>
+                    <div class="circle-node" style="left:79.7%; top:79.7%;">
+                        <div class="flow-icon"><i data-lucide="brain"></i></div><p class="text-xs sm:text-sm font-bold text-slate-800">KI-Seminare</p>
+                    </div>
+                    <div class="circle-node" style="left:50%; top:92%;">
+                        <div class="flow-icon flow-icon-lg"><i data-lucide="users"></i></div><p class="text-sm sm:text-base font-black text-slate-900">Studierende</p>
+                    </div>
+                    <div class="circle-node" style="left:20.3%; top:79.7%;">
+                        <div class="flow-icon"><i data-lucide="lightbulb"></i></div><p class="text-xs sm:text-sm font-bold text-slate-800">Ideen &amp; Prototypen</p>
+                    </div>
+                    <div class="circle-node" style="left:8%; top:50%;">
+                        <div class="flow-icon flow-icon-lg"><i data-lucide="trophy"></i></div><p class="text-sm sm:text-base font-black text-slate-900">Gewinner</p>
+                    </div>
+                    <div class="circle-node" style="left:20.3%; top:20.3%;">
+                        <div class="flow-icon"><i data-lucide="rocket"></i></div><p class="text-xs sm:text-sm font-bold text-slate-800">Praktikum &amp; Pilot</p>
+                    </div>
+                </div>
+                <p class="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mt-6">Eine Challenge, viele Ergebnisse</p>
+            </div>
+
+            <!-- ABLAUF – Mobile (vertikal) -->
+            <div class="md:hidden flex flex-col items-center gap-1 reveal">
+                <div class="flow-node highlight"><div class="flow-icon"><i data-lucide="factory"></i></div><p class="text-sm font-bold text-slate-800">Unternehmen</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node"><div class="flow-icon"><i data-lucide="target"></i></div><p class="text-sm font-bold text-slate-800">Challenge</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node highlight"><div class="flow-icon"><i data-lucide="graduation-cap"></i></div><p class="text-sm font-bold text-slate-800">Hochschulen</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node"><div class="flow-icon"><i data-lucide="brain"></i></div><p class="text-sm font-bold text-slate-800">KI-Seminare</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node highlight"><div class="flow-icon"><i data-lucide="users"></i></div><p class="text-sm font-bold text-slate-800">Studierende</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node"><div class="flow-icon"><i data-lucide="lightbulb"></i></div><p class="text-sm font-bold text-slate-800">Ideen &amp; Prototypen</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node highlight"><div class="flow-icon"><i data-lucide="trophy"></i></div><p class="text-sm font-bold text-slate-800">Gewinner</p></div>
+                <div class="flow-arrow-v"></div>
+                <div class="flow-node"><div class="flow-icon"><i data-lucide="rocket"></i></div><p class="text-sm font-bold text-slate-800">Praktikum &amp; Pilot</p></div>
+                <div class="flex items-center gap-2 mt-3 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    <i data-lucide="corner-down-left" class="w-4 h-4"></i> zurück zum Unternehmen
+                </div>
+            </div>
+
+            <p class="text-center text-base sm:text-lg text-slate-600 font-medium max-w-3xl mx-auto mt-14 reveal">
+                Eine einzige Herausforderung kann gleichzeitig an mehreren Hochschulen bearbeitet werden –
+                und führt zu neuen Ideen, Talenten und Innovationen.
+            </p>
+        </div>
+    </section>
+
+    <!-- WARUM KIWIHUB -->
+    <section id="warum" class="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Der Nutzen</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">Warum Unternehmen KiwiHub nutzen</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="glass-card rounded-2xl p-7 reveal">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">💡</div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Neue Ideen</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Erhalten Sie zahlreiche Lösungsansätze für reale Unternehmensprobleme.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.05s">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">🤖</div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">KI-gestützte Innovation</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Studierende arbeiten mit modernsten KI-Werkzeugen und entwickeln schneller bessere Lösungen.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.1s">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">🎓</div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Europäische Talente</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Lernen Sie zukünftige Mitarbeitende bereits während ihrer Projektarbeit kennen.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.15s">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">🚀</div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Innovation mit Wirkung</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Aus Projekten entstehen Praktika, Forschungskooperationen, Pilotprojekte oder sogar Start-ups.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FÜR WEN -->
+    <section id="zielgruppen" class="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-white/70 border-y border-slate-200/70">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Mitmachen</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">Für wen ist KiwiHub?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-card rounded-2xl p-8 flex flex-col reveal">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                        <i data-lucide="factory" class="w-6 h-6 text-lime-600"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-3">Für Unternehmen</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Veröffentlichen Sie reale Herausforderungen und erhalten Sie innovative Lösungen aus Europas Hochschulen.</p>
+                    <a href="#" class="btn-primary font-bold text-sm px-5 py-3 rounded-xl text-center">Challenge veröffentlichen</a>
+                </div>
+                <div class="glass-card rounded-2xl p-8 flex flex-col reveal" style="transition-delay:.05s">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-lime-600"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-3">Für Hochschulen</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Integrieren Sie Praxisprojekte in Ihre Lehre und ermöglichen Sie Studierenden echte Innovationserfahrung.</p>
+                    <a href="#" class="btn-secondary font-bold text-sm px-5 py-3 rounded-xl text-center text-slate-700 bg-white">Seminar eintragen</a>
+                </div>
+                <div class="glass-card rounded-2xl p-8 flex flex-col reveal" style="transition-delay:.1s">
+                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                        <i data-lucide="user-round" class="w-6 h-6 text-lime-600"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-3">Für Studierende</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Bearbeiten Sie reale Industrie-Challenges, bauen Sie Ihr Portfolio auf und werden Sie von Unternehmen entdeckt.</p>
+                    <a href="#" class="btn-secondary font-bold text-sm px-5 py-3 rounded-xl text-center text-slate-700 bg-white">Projekt eintragen</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISION -->
+    <section id="vision" class="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="kicker mb-3 reveal">Unsere Vision</p>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-6 reveal">
+                Wir bauen Europas Infrastruktur für KI-gestützte Innovation.
+            </h2>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto mb-16 reveal">
+                KiwiHub verbindet Unternehmen, Hochschulen und Studierende zu einem gemeinsamen Innovationsnetzwerk.
+                Reale Herausforderungen werden zu Lehrprojekten. Lehrprojekte werden zu Innovationen.
+                Innovationen werden zu Forschung, Talenten und neuen Unternehmen.
+            </p>
+
+            <div class="flex items-center justify-center gap-3 sm:gap-6 reveal">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="timeline-dot"></div>
+                    <p class="text-sm font-black text-slate-800">Challenge</p>
+                </div>
+                <div class="w-10 sm:w-20 h-px bg-slate-300"></div>
+                <div class="flex flex-col items-center gap-3">
+                    <div class="timeline-dot"></div>
+                    <p class="text-sm font-black text-slate-800">Seminar</p>
+                </div>
+                <div class="w-10 sm:w-20 h-px bg-slate-300"></div>
+                <div class="flex flex-col items-center gap-3">
+                    <div class="timeline-dot"></div>
+                    <p class="text-sm font-black text-slate-800">Innovation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta" class="w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-gradient-to-br from-lime-400 to-emerald-500">
+        <div class="max-w-3xl mx-auto text-center reveal">
+            <h2 class="text-3xl sm:text-5xl font-black text-[#0d1a0a] leading-tight mb-5">Werden Sie Gründungspartner von KiwiHub.</h2>
+            <p class="text-lg text-[#0d1a0a]/80 font-medium mb-10">Gestalten Sie mit uns die Zukunft der Zusammenarbeit zwischen Industrie und Hochschulen.</p>
+            <a href="#" class="inline-flex items-center gap-2 bg-[#0d1a0a] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#182b16] transition-colors shadow-lg shadow-black/10">
+                Jetzt Challenge starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full border-t border-slate-200 bg-white py-10 text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="font-semibold text-slate-600">KiwiHub — Europas KI-Innovationsökosystem für Unternehmen und Hochschulen.</p>
+            <div class="flex gap-6 font-semibold">
+                <a href="#" class="hover:text-lime-600 transition">Impressum</a>
+                <a href="#" class="hover:text-lime-600 transition">Datenschutz</a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // ===== AUFFÄCHERNDE LINIENBÜNDEL IM KREISLAUF =====
+    // Zeigt: aus einer Challenge entstehen viele Ergebnisse, die sich am Ende wieder bündeln.
+    (function () {
+        const svg = document.getElementById('circle-lines');
+        if (!svg) return;
+        const svgns = 'http://www.w3.org/2000/svg';
+        const CX = 200, CY = 200, R = 170;
+
+        function polar(angleDeg, r) {
+            const a = angleDeg * Math.PI / 180;
+            return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+        }
+
+        // Reihenfolge der Stationen im Kreis (45° Schritte) + Linienanzahl je Verbindung
+        const segments = [
+            { a1: -90, a2: -45, n: 1 },  // Unternehmen -> Challenge
+            { a1: -45, a2: 0,   n: 3 },  // Challenge -> Hochschulen
+            { a1: 0,   a2: 45,  n: 5 },  // Hochschulen -> KI-Seminare
+            { a1: 45,  a2: 90,  n: 10 }, // KI-Seminare -> Studierende
+            { a1: 90,  a2: 135, n: 10 }, // Studierende -> Ideen
+            { a1: 135, a2: 180, n: 5 },  // Ideen -> Gewinner
+            { a1: 180, a2: 225, n: 3 },  // Gewinner -> Praktikum
+            { a1: 225, a2: 270, n: 1 },  // Praktikum -> zurück zu Unternehmen
+        ];
+
+        segments.forEach((seg) => {
+            const p1 = polar(seg.a1, R);
+            const p2 = polar(seg.a2, R);
+            const amid = (seg.a1 + seg.a2) / 2;
+            const spread = Math.min(46, 14 + seg.n * 3.4);
+
+            for (let k = 0; k < seg.n; k++) {
+                const t = seg.n === 1 ? 0 : (k / (seg.n - 1)) - 0.5;
+                const offset = t * spread;
+                const cp = polar(amid, R + offset);
+
+                const path = document.createElementNS(svgns, 'path');
+                path.setAttribute('d', `M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cp.x.toFixed(1)} ${cp.y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`);
+                path.setAttribute('class', 'flow-line');
+                path.setAttribute('stroke-width', seg.n >= 8 ? '1.3' : '1.7');
+                path.style.animationDelay = (-(Math.random() * 16)).toFixed(2) + 's';
+                svg.appendChild(path);
+            }
+        });
+    })();
+
+    // ===== GENERATIVES KI-FLOW-FIELD IM HEADER =====
+    // Sichtbares Signal: hier rechnet ein System in Echtzeit, kein statisches Bild.
+    (function () {
+        const canvas = document.getElementById('flow-canvas');
+        const ctx = canvas.getContext('2d');
+        const header = canvas.parentElement;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let w = 0, h = 0, dpr = 1;
+        let particles = [];
+
+        function spawn() {
+            return {
+                x: Math.random() * w,
+                y: Math.random() * h,
+                life: 80 + Math.random() * 160
+            };
+        }
+
+        function resize() {
+            const rect = header.getBoundingClientRect();
+            if (rect.width < 2 || rect.height < 2) return;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = rect.width;
+            h = rect.height;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.fillStyle = '#fafaf8';
+            ctx.fillRect(0, 0, w, h);
+            if (particles.length === 0) {
+                particles = Array.from({ length: 150 }, spawn);
+            }
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+        if (window.ResizeObserver) {
+            new ResizeObserver(resize).observe(header);
+        }
+
+        let mouse = { x: -9999, y: -9999, active: false };
+
+        function fieldAngle(x, y, t) {
+            return (
+                Math.sin(x * 0.0035 + t) * Math.cos(y * 0.004 - t * 0.8) * Math.PI +
+                Math.sin((x + y) * 0.002 + t * 0.5)
+            );
+        }
+
+        header.addEventListener('mousemove', (e) => {
+            const rect = header.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            mouse.active = true;
+        });
+        header.addEventListener('mouseleave', () => { mouse.active = false; });
+
+        let t = 0;
+        function tick() {
+            if (w > 2 && h > 2 && particles.length) {
+                t += 0.0035;
+                ctx.fillStyle = 'rgba(250,250,248,0.045)';
+                ctx.fillRect(0, 0, w, h);
+
+                particles.forEach((p) => {
+                    let angle = fieldAngle(p.x, p.y, t);
+
+                    if (mouse.active) {
+                        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 170) {
+                            const tangential = Math.atan2(dy, dx) + Math.PI / 2;
+                            const influence = (1 - dist / 170) * 1.4;
+                            angle = angle * (1 - influence) + tangential * influence;
+                        }
+                    }
+
+                    const speed = 1.3;
+                    const nx = p.x + Math.cos(angle) * speed;
+                    const ny = p.y + Math.sin(angle) * speed;
+
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(nx, ny);
+                    ctx.strokeStyle = 'rgba(84,158,20,0.75)';
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+
+                    p.x = nx; p.y = ny; p.life--;
+
+                    if (p.life <= 0 || p.x < 0 || p.x > w || p.y < 0 || p.y > h) {
+                        Object.assign(p, spawn());
+                    }
+                });
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if (!reduceMotion) requestAnimationFrame(tick);
+    })();
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
