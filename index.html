@@ -338,6 +338,12 @@
             margin-top:-12px;
             font-size:.68rem;
         }
+
+        /* 8 Kreise etwas kleiner, nur mobile */
+        .circle-node{ width:80px; }
+        .ring-icon{ width:52px; height:52px; }
+        .ring-icon svg{ width:22px; height:22px; }
+        .circle-node.main-node .ring-icon{ width:68px; height:68px; }
     }
 
     /* ---------- Timeline ---------- */
@@ -433,6 +439,22 @@
     @media (prefers-reduced-motion: reduce){
         .hanging-sign, .sign-link{ animation:none !important; opacity:1; transform:none; }
     }
+
+    /* ---------- Offizielles Prüfsiegel (ersetzt die 3-Schilder-Kette am Desktop) ---------- */
+    .official-seal{
+        position:relative;
+        width:190px; height:190px;
+        border-radius:50%;
+        overflow:hidden;
+    }
+    .official-seal-svg{ width:100%; height:100%; display:block; }
+    .official-seal-svg .syn-line{ animation:synapseFlow 3.4s ease-in-out infinite; }
+    .official-seal-svg .syn-node{ animation:synapsePulse 3.4s ease-in-out infinite; }
+    @keyframes synapseFlow{ 0%,100%{ opacity:.18; } 50%{ opacity:.7; } }
+    @keyframes synapsePulse{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
+    @media (prefers-reduced-motion: reduce){
+        .official-seal-svg .syn-line, .official-seal-svg .syn-node{ animation:none; opacity:.4; }
+    }
 </style>
 </head>
 <body class="antialiased selection:bg-lime-300 selection:text-slate-900">
@@ -456,7 +478,7 @@
     <!-- TRUST BAR -->
     <div class="w-full bg-[#101c12] text-white/90 text-xs sm:text-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center">
-            <span class="font-semibold">In Gründung – gemeinsam mit einem Lehrstuhl der Uni</span>
+            <span class="font-semibold">In Gründung – gemeinsam mit einem ersten Hochschul-Lehrstuhl</span>
             <span class="hidden sm:inline text-white/30">•</span>
             <span class="text-white/70">Erste Industriepartner gesucht</span>
         </div>
@@ -469,47 +491,67 @@
                 <span class="bg-gradient-to-br from-lime-400 to-emerald-500 text-[#0d1a0a] px-2.5 py-1 rounded-lg font-black text-base tracking-tight shadow-md shadow-emerald-400/25">kiwi</span>
                 <span class="text-base font-black tracking-tight text-slate-900 pl-1.5">hub</span>
 
-                <!-- Mobil: EIN Schild mit dem gesamten Text, nach rechts verlängert -->
-                <div class="hanging-sign-center-mobile md:hidden">
-                    <div class="hanging-sign">
-                        <div class="sign-link">
-                            <div class="hanging-sign-strings">
-                                <span></span>
-                            </div>
-                            <div class="hanging-sign-badge">
-                                <i data-lucide="sparkles" class="w-3 h-3"></i> Europaweites KI innovationsökosystem
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Desktop: Schilder-Kette, jedes Schild baumelt unabhängig -->
+                <!-- Desktop: EIN offizielles Prüfsiegel mit Synapsen-Animation im Hintergrund -->
                 <div class="hanging-sign-center hidden md:block">
                     <div class="hanging-sign hanging-sign-chain">
                         <div class="sign-link">
                             <div class="hanging-sign-strings sign-string-top">
                                 <span></span>
                             </div>
-                            <div class="hanging-sign-badge">
-                                <i data-lucide="sparkles" class="w-5 h-5"></i> Europaweites
-                            </div>
-                        </div>
+                            <div class="official-seal">
+                                <svg class="official-seal-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <path id="sealTopArc" d="M 30,100 A 70,70 0 0 1 170,100" />
+                                        <path id="sealBottomArc" d="M 20,100 A 80,80 0 0 0 180,100" />
+                                        <radialGradient id="sealBg" cx="50%" cy="38%" r="65%">
+                                            <stop offset="0%" stop-color="#f4fce8"/>
+                                            <stop offset="55%" stop-color="#e5f9d2"/>
+                                            <stop offset="100%" stop-color="#d3f2b8"/>
+                                        </radialGradient>
+                                        <clipPath id="sealClip"><circle cx="100" cy="100" r="90"/></clipPath>
+                                        <mask id="kiMask">
+                                            <rect x="0" y="0" width="200" height="200" fill="#fff"/>
+                                            <text x="100" y="112" font-size="60" font-weight="900" text-anchor="middle" fill="#000">KI</text>
+                                        </mask>
+                                    </defs>
 
-                        <div class="sign-link">
-                            <div class="hanging-sign-strings">
-                                <span></span>
-                            </div>
-                            <div class="hanging-sign-badge" style="font-weight:900;">
-                                KI
-                            </div>
-                        </div>
+                                    <g mask="url(#kiMask)">
+                                        <circle cx="100" cy="100" r="94" fill="url(#sealBg)"/>
+                                        <g clip-path="url(#sealClip)">
+                                            <g stroke="#7cc016" stroke-width="1.2">
+                                                <line class="syn-line" x1="36" y1="50" x2="88" y2="88" style="animation-delay:0s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="148" y2="56" style="animation-delay:.3s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="64" y2="148" style="animation-delay:.6s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="140" y2="142" style="animation-delay:.9s"/>
+                                                <line class="syn-line" x1="148" y1="56" x2="168" y2="108" style="animation-delay:.45s"/>
+                                                <line class="syn-line" x1="64" y1="148" x2="140" y2="142" style="animation-delay:1.2s"/>
+                                                <line class="syn-line" x1="36" y1="50" x2="30" y2="114" style="animation-delay:.75s"/>
+                                            </g>
+                                            <g fill="#22b56b">
+                                                <circle class="syn-node" cx="36" cy="50" r="4" style="animation-delay:0s"/>
+                                                <circle class="syn-node" cx="88" cy="88" r="5.5" style="animation-delay:.2s"/>
+                                                <circle class="syn-node" cx="148" cy="56" r="4" style="animation-delay:.4s"/>
+                                                <circle class="syn-node" cx="64" cy="148" r="4" style="animation-delay:.6s"/>
+                                                <circle class="syn-node" cx="140" cy="142" r="4" style="animation-delay:.8s"/>
+                                                <circle class="syn-node" cx="168" cy="108" r="3.5" style="animation-delay:1s"/>
+                                                <circle class="syn-node" cx="30" cy="114" r="3.5" style="animation-delay:1.2s"/>
+                                            </g>
+                                        </g>
+                                        <circle cx="100" cy="100" r="94" fill="none" stroke="#15803d" stroke-width="4"/>
+                                        <circle cx="100" cy="100" r="82" fill="none" stroke="#15803d" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.55"/>
+                                    </g>
 
-                        <div class="sign-link">
-                            <div class="hanging-sign-strings">
-                                <span></span>
-                            </div>
-                            <div class="hanging-sign-badge" style="white-space:normal; text-align:center; line-height:1.25;">
-                                Innovations-<br>ökosystem
+                                    <!-- feine gravierte Kontur um den KI-Ausschnitt -->
+                                    <text x="100" y="112" font-size="60" font-weight="900" text-anchor="middle" fill="none" stroke="#14532d" stroke-width="0.75" opacity="0.35">KI</text>
+
+                                    <text font-size="16.5" font-weight="800" letter-spacing="1.5" fill="#14532d">
+                                        <textPath href="#sealTopArc" startOffset="50%" text-anchor="middle">EUROPAWEITES</textPath>
+                                    </text>
+
+                                    <text font-size="13.5" font-weight="800" letter-spacing="0.6" fill="#14532d">
+                                        <textPath href="#sealBottomArc" startOffset="50%" text-anchor="middle">INNOVATIONSÖKOSYSTEM</textPath>
+                                    </text>
+                                </svg>
                             </div>
                         </div>
                     </div>
@@ -522,8 +564,12 @@
                 <a href="#vision" class="hover:text-slate-900 transition-colors">Vision</a>
             </div>
             <div class="flex items-center gap-3">
+                <div class="md:hidden inline-flex items-center gap-1.5 rounded-full bg-white border border-lime-300 text-emerald-700 px-2.5 py-1.5 shadow-sm max-w-[150px]">
+                    <i data-lucide="sparkles" class="w-3 h-3 shrink-0"></i>
+                    <span class="text-[10px] font-bold leading-tight">Europaweites KI innovationsökosystem</span>
+                </div>
                 <button class="hidden sm:inline text-sm font-semibold text-slate-600 hover:text-slate-900 transition">Anmelden</button>
-                <a href="#cta" class="btn-primary text-sm font-bold px-4 sm:px-5 py-2.5 rounded-lg">KI-Innovation starten</a>
+                <a href="#cta" class="hidden md:inline-block btn-primary text-sm font-bold px-4 sm:px-5 py-2.5 rounded-lg">KI-Innovation starten</a>
             </div>
         </div>
     </nav>
@@ -551,7 +597,7 @@
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="#cta" class="btn-primary font-bold text-base px-7 py-3.5 rounded-xl inline-flex items-center gap-2">
-                    KI Innovation starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    KI-Innovation starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
                 <a href="#funktion" class="btn-secondary font-bold text-base px-7 py-3.5 rounded-xl text-slate-700 bg-white/70">
                     So funktioniert KiwiHub
@@ -606,7 +652,7 @@
                     Aus einer <span class="pop">Innovationsfrage</span> wird ein offener Innovationsprozess.
                 </h3>
                 <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-5">
-                    Ihre Innovationsfrage wird in Lehrveranstaltungen mehrerer Hochschulen integriert und von <strong class="text-slate-800">interdisziplinären Studierendenteams</strong> bearbeitet. Unterstützt durch <span class="pop">modernste KI-Werkzeuge</span> und wissenschaftlich begleitet entstehen unterschiedliche Lösungsansätze, neue Perspektiven und erste Prototypen für reale unternehmerische Fragestellungen.
+                    Ihre Fragestellung wird in Lehrveranstaltungen mehrerer Hochschulen integriert und von <strong class="text-slate-800">interdisziplinären Studierendenteams</strong> bearbeitet. Unterstützt durch <span class="pop">modernste KI-Werkzeuge</span> und wissenschaftlich begleitet entstehen unterschiedliche Lösungsansätze, neue Perspektiven und erste Prototypen für reale unternehmerische Fragestellungen.
                 </p>
                 <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-6">
                     Für Ihr Unternehmen bedeutet das mehr als ein einzelnes Projektergebnis: Sie erhalten Zugang zu kreativen Ideen, lernen potenzielle Nachwuchskräfte frühzeitig kennen, knüpfen Kontakte zu führenden Lehrstühlen und schaffen die Grundlage für <strong class="text-slate-800">Pilotprojekte, Forschungskooperationen</strong> oder Ausgründungen.
@@ -732,7 +778,7 @@
                         </div>
                         <h3 class="text-xl font-black text-slate-900 mb-3">Für Unternehmen</h3>
                         <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Veröffentlichen Sie reale Herausforderungen und erhalten Sie innovative Lösungen aus Europas Hochschulen.</p>
-                        <a href="#" class="btn-primary font-bold text-sm px-5 py-3 rounded-xl text-center">Challenge veröffentlichen</a>
+                        <a href="#" class="btn-primary font-bold text-sm px-5 py-3 rounded-xl text-center">Innovationsfrage veröffentlichen</a>
                     </div>
                 </div>
                 <div class="glass-card rounded-2xl overflow-hidden flex flex-col reveal" style="transition-delay:.05s">
@@ -867,7 +913,7 @@
             <h2 class="text-3xl sm:text-5xl font-black text-[#0d1a0a] leading-tight mb-5">Werden Sie Gründungspartner von kiwihub.</h2>
             <p class="text-lg text-[#0d1a0a]/80 font-medium mb-10">Gestalten Sie mit uns die Zukunft der Zusammenarbeit zwischen Industrie und Hochschulen.</p>
             <a href="#" class="inline-flex items-center gap-2 bg-[#0d1a0a] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#182b16] transition-colors shadow-lg shadow-black/10">
-                Jetzt Challenge starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                Jetzt KI-Innovation starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
         </div>
     </section>
@@ -960,7 +1006,7 @@
         const kiwiSlice = document.getElementById('circle-kiwi-slice');
         if (!container || !svg || !kiwiSlice) return;
 
-        const nodesData = ["Unternehmen", "Challenge", "Hochschulen", "KI-Seminare", "Studierende", "Ideen & Prototypen", "Gewinner", "Praktikum & Pilot"];
+        const nodesData = ["Unternehmen", "Innovationsfrage", "Hochschulen", "KI-Seminare", "Studierende", "Ideen & Prototypen", "Gewinner", "Praktikum & Pilot"];
         const icons = ["factory", "target", "graduation-cap", "brain", "users", "lightbulb", "trophy", "rocket"];
         // Indizes 0,2,4,6 entsprechen oben, rechts, unten, links -> hervorgehoben UND animiert (pulsieren)
         const mainIndices = [0, 2, 4, 6];
