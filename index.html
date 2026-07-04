@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiwiHub | Europas KI-Innovationsökosystem</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    :root{
+        --kiwi-50:#f5fbe8;
+        --kiwi-400:#8fd332;
+        --kiwi-500:#7cc016;
+        --kiwi-600:#5fa012;
+        --emerald-500:#22b56b;
+        --ink:#10151a;
+        --paper:#fafaf8;
+        --line:#e7e5df;
+    }
+
+    html{ scroll-behavior:smooth; overflow-x:hidden; }
+    body{
+        font-family:'Inter',sans-serif;
+        background-color:var(--paper);
+        color:var(--ink);
+        overflow-x:hidden;
+    }
+
+    /* ---------- Shader Hero Background (deckt die gesamte Hero-Section ab) ---------- */
+    #bg-canvas{
+        position:absolute; top:0; left:0; width:100%; height:calc(100% - 42px); z-index:0;
+        display:block; pointer-events:none;
+        filter:drop-shadow(0 30px 50px rgba(132,204,22,.2));
+    }
+    /* ---------- Grüne Wellenlinie (wiederverwendbar) ---------- */
+    .wave-line-svg{ position:absolute; left:0; width:100%; height:100px; z-index:2; pointer-events:none; overflow:visible; }
+    .wave-back{ animation:wobbleBack 9s ease-in-out infinite; }
+    .wave-front{ animation:wobbleFront 6.5s ease-in-out infinite; }
+    @keyframes wobbleBack{
+        0%,100%{ d:path("M0,42 C 120,34 240,50 480,42 C 600,34 720,50 960,42 C 1080,34 1200,50 1440,42 C 1560,34 1680,50 1920,42 L1920,62 C 1800,54 1680,70 1440,62 C 1320,54 1200,70 960,62 C 840,54 720,70 480,62 C 360,54 240,70 0,62 Z"); }
+        50%{ d:path("M0,46 C 120,54 240,38 480,46 C 600,54 720,38 960,46 C 1080,54 1200,38 1440,46 C 1560,54 1680,38 1920,46 L1920,66 C 1800,74 1680,58 1440,66 C 1320,74 1200,58 960,66 C 840,74 720,58 480,66 C 360,74 240,58 0,66 Z"); }
+    }
+    @keyframes wobbleFront{
+        0%,100%{ d:path("M0,48 C 120,42 240,54 480,48 C 600,42 720,54 960,48 C 1080,42 1200,54 1440,48 C 1560,42 1680,54 1920,48 L1920,64 C 1800,58 1680,70 1440,64 C 1320,58 1200,70 960,64 C 840,58 720,70 480,64 C 360,58 240,70 0,64 Z"); }
+        50%{ d:path("M0,44 C 120,52 240,38 480,44 C 600,52 720,38 960,44 C 1080,52 1200,38 1440,44 C 1560,52 1680,38 1920,44 L1920,60 C 1800,68 1680,54 1440,60 C 1320,68 1200,54 960,60 C 840,68 720,54 480,60 C 360,68 240,54 0,60 Z"); }
+    }
+    .kiwi-slice-header{
+        position:absolute; width:200px; height:200px;
+        background:conic-gradient(from 0deg, #84cc16 0deg, #bfef45 30deg, #84cc16 60deg, #22c55e 120deg, #15803d 180deg, #84cc16 360deg);
+        border-radius:50%; opacity:.15; filter:blur(2px);
+        animation:spinSlice 20s linear infinite;
+    }
+    @keyframes spinSlice{ from{ transform:rotate(0deg) scale(1); } to{ transform:rotate(360deg) scale(1.1); } }
+    .kiwi-slice-header::before{
+        content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        width:60px; height:60px; background:var(--paper); border-radius:50%; z-index:2;
+    }
+
+    /* ---------- Kiwi-Seed Partikel (folgen dem Mauszeiger im Shader) ---------- */
+    .kiwi-seed{
+        position:fixed; width:6px; height:6px;
+        background:radial-gradient(circle at 30% 30%, #bfef45, #84cc16);
+        border-radius:50%; pointer-events:none; z-index:15; opacity:.9;
+        box-shadow:0 0 12px rgba(132,204,22,.8), inset -1px -1px 2px rgba(0,0,0,.2);
+    }
+    @keyframes seedFloat{
+        0%{ transform:translateY(0) translateX(0) scale(1); opacity:1; }
+        50%{ opacity:.8; }
+        100%{ transform:translateY(-120px) translateX(var(--tx)) scale(.3); opacity:0; }
+    }
+    .seed-float{ animation:seedFloat 1.8s cubic-bezier(.25,.46,.45,.94) forwards; }
+    @media (prefers-reduced-motion: reduce){
+        .kiwi-slice-header{ animation:none; }
+    }
+
+    ::-webkit-scrollbar{ width:9px; }
+    ::-webkit-scrollbar-track{ background:var(--paper); }
+    ::-webkit-scrollbar-thumb{ background:linear-gradient(to bottom,var(--kiwi-500),var(--emerald-500)); border-radius:5px; }
+
+    /* ---------- Ambient Background (ruhig, dezent) ---------- */
+    .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    }
+    .ambient .blob{
+        position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+        animation:driftBlob 26s ease-in-out infinite;
+    }
+    .ambient .blob-1{ width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle at 30% 30%, var(--kiwi-400), transparent 70%); }
+    .ambient .blob-2{ width:460px; height:460px; top:-60px; right:-160px; background:radial-gradient(circle at 60% 40%, var(--emerald-500), transparent 70%); animation-delay:-8s; }
+    .ambient .blob-3{ width:380px; height:380px; top:260px; left:35%; background:radial-gradient(circle, var(--kiwi-500), transparent 70%); opacity:.16; animation-delay:-16s; }
+    @keyframes driftBlob{
+        0%,100%{ transform:translate(0,0) scale(1); }
+        50%{ transform:translate(24px,30px) scale(1.06); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .ambient .blob{ animation:none; }
+    }
+
+    /* ---------- Reveal on scroll ---------- */
+    .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+    /* ---------- Gradient text ---------- */
+    .grad-text{
+        background:linear-gradient(100deg, var(--kiwi-600), var(--emerald-500));
+        -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    /* ---------- Glass cards ---------- */
+    .glass-card{
+        background:rgba(255,255,255,.66);
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
+        border:1px solid var(--line);
+        transition:transform .35s cubic-bezier(.22,1,.36,1), border-color .35s ease, box-shadow .35s ease;
+    }
+    .glass-card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(124,192,22,.55);
+        box-shadow:0 20px 40px -20px rgba(34,181,107,.35);
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn-primary{
+        background:linear-gradient(100deg, var(--kiwi-400), var(--emerald-500));
+        color:#0d1a0a;
+        transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease;
+    }
+    .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 16px 30px -12px rgba(34,181,107,.5); }
+    .btn-secondary{
+        border:1.5px solid var(--line);
+        transition:border-color .3s ease, background .3s ease, transform .3s ease;
+    }
+    .btn-secondary:hover{ border-color:var(--kiwi-500); background:rgba(124,192,22,.06); transform:translateY(-2px); }
+
+    /* ---------- Flow diagram (Signature-Element) ---------- */
+    .flow-track{ position:relative; }
+    .flow-node{
+        display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem;
+        min-width:132px;
+    }
+    .flow-icon{
+        width:66px; height:66px; border-radius:9999px;
+        display:flex; align-items:center; justify-content:center;
+        background:transparent; border:2px solid rgba(255,255,255,.55);
+        box-shadow:0 4px 14px -8px rgba(16,21,26,.15);
+        position:relative; z-index:2; overflow:hidden;
+    }
+    .flow-icon svg{ position:relative; z-index:2; width:24px; height:24px; stroke:#ffffff; stroke-width:1.9; filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); }
+    .flow-icon-lg{ width:82px; height:82px; }
+    .flow-icon-lg svg{ width:30px; height:30px; }
+    .flow-node.highlight .flow-icon{
+        border-color:rgba(255,255,255,.85);
+        box-shadow:0 0 0 4px rgba(255,255,255,.12), 0 8px 20px -8px rgba(0,0,0,.25);
+    }
+    .flow-arrow{ flex:1; min-width:28px; height:2px; position:relative; align-self:center; margin-top:-28px; }
+    .flow-arrow svg{ width:100%; height:16px; overflow:visible; display:block; }
+    .flow-dash{ stroke-dasharray:6 6; animation:dashMove 1.6s linear infinite; }
+    @keyframes dashMove{ to{ stroke-dashoffset:-24; } }
+
+    .flow-arrow-v{
+        width:2px; height:26px;
+        background:repeating-linear-gradient(to bottom, #7cc016 0 4px, transparent 4px 8px);
+        animation:dashMoveV 1s linear infinite;
+    }
+    @keyframes dashMoveV{ to{ background-position:0 -8px; } }
+
+    /* ---------- Kreis-Layout "So funktioniert KiwiHub" (neue Kreisgrafik) ---------- */
+    .circle-flow{
+        position:relative;
+        width:100%;
+        max-width:620px;
+        aspect-ratio:1/1;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .circle-track{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+    .flow-line{ fill:none; stroke:#7cc016; stroke-width:3; stroke-linecap:round; stroke-dasharray:6 6; }
+    @keyframes flowMove{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:-12; } }
+    /* Gemeinsames, weiches Ausblenden des kompletten Rings kurz bevor der Zyklus neu startet. */
+    @keyframes lineFadeOut{
+        0%{ opacity:1; }
+        94.3662%{ opacity:1; }
+        100%{ opacity:0; }
+    }
+
+    .mega-background-layer{ position:absolute; inset:0; display:flex; justify-content:center; align-items:center; z-index:0; }
+    .kiwi-slice{
+        position:absolute;
+        background:conic-gradient(from 0deg, #84cc16 0deg, #bfef45 30deg, #84cc16 60deg, #22c55e 120deg, #15803d 180deg, #84cc16 360deg);
+        border-radius:50%; filter:blur(2px);
+        animation:spinSliceRing 20s linear infinite;
+    }
+    @keyframes spinSliceRing{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+    .blob{
+        position:absolute; border-radius:50%;
+        background:radial-gradient(circle, #fef08a 0%, #fde047 70%, transparent 90%);
+        opacity:.6; filter:blur(12px);
+        animation:blobWobble 6s ease-in-out infinite alternate;
+    }
+    .blob-1{ width:34%; height:34%; animation-duration:9s; }
+    .blob-2{ width:26%; height:26%; animation-delay:-3s; animation-duration:6.5s; }
+    @keyframes blobWobble{
+        0%{ transform:scale(1) translate(0,0); }
+        50%{ transform:scale(1.1) translate(4%,-4%); }
+        100%{ transform:scale(0.95) translate(-4%,4%); }
+    }
+    .text-content{
+        position:relative; z-index:10; text-align:center;
+        color:#3f6212; line-height:1.18; font-size:1.05rem;
+        letter-spacing:-0.01em;
+        text-shadow:0 0 1px rgba(255,255,255,.6);
+        pointer-events:none;
+    }
+    .text-content b{ font-size:1.5rem; color:#1a2e05; font-weight:900; }
+    .word-wrapper{
+        height:1.35em; overflow:hidden; display:block; position:relative; margin-top:2px;
+    }
+    .word-list{
+        list-style:none; margin:0; padding:0;
+        animation:megaWordCycle 12s infinite cubic-bezier(0.45,0,0.55,1);
+    }
+    .word-list li{
+        height:1.35em; display:flex; justify-content:center; align-items:center;
+        font-weight:800; color:#15803d;
+    }
+    @keyframes megaWordCycle{
+        0%,20%   { transform:translateY(0); }
+        25%,45%  { transform:translateY(-1.35em); }
+        50%,70%  { transform:translateY(-2.7em); }
+        75%,95%  { transform:translateY(-4.05em); }
+        100%     { transform:translateY(-5.4em); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .kiwi-slice{ animation:none; }
+        .blob{ animation:none; }
+        .word-list{ animation:none; }
+    }
+
+    /* Mobile: großen grünen Kreis hinter der Kreisgrafik entfernen, gelbe Blobs bleiben */
+    @media (max-width:767px){
+        #circle-kiwi-slice{ display:none; }
+    }
+
+    .circle-node{
+        position:absolute; transform:translate(-50%,-50%);
+        width:100px; z-index:5;
+    }
+    .circle-node .node-inner{
+        display:flex; flex-direction:column; align-items:center; gap:.4rem;
+        transform-origin:center center;
+    }
+    .circle-node.idle-node .ring-icon{ opacity:.8; }
+    .circle-node.idle-node .node-label{ opacity:.75; }
+
+    .ring-icon{
+        width:64px; height:64px;
+        border-radius:9999px; display:flex; align-items:center; justify-content:center;
+        background:#fff; border:2px solid #15803d;
+        box-shadow:0 4px 14px -8px rgba(16,21,26,.15);
+        position:relative; overflow:hidden;
+    }
+    .ring-icon svg{ width:28px; height:28px; stroke:#15803d; }
+    .ring-icon i[data-lucide]{ fill:#15803d; }
+    .ring-icon .shine{
+        position:absolute; top:0; left:0; width:55%; height:100%;
+        background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.95) 50%, transparent 100%);
+        transform:translateX(-160%); opacity:0; pointer-events:none; z-index:3;
+    }
+    .node-label{
+        display:block; margin-top:.4rem; font-size:.72rem; font-weight:800; color:#10151a;
+        text-shadow:0 0 1px rgba(255,255,255,.8); text-align:center;
+    }
+
+    /* --- Hervorhebung der 4 Hauptknoten (oben/rechts/unten/links) - diese pulsieren --- */
+    .circle-node.main-node{ z-index:6; }
+    .circle-node.main-node .ring-icon{
+        width:84px; height:84px;
+        border:3px solid #15803d;
+        background:linear-gradient(145deg, #ffffff 0%, #ecfccb 100%);
+        box-shadow:0 0 0 6px rgba(124,192,22,.18), 0 8px 24px -6px rgba(21,128,61,.45);
+    }
+    .circle-node.main-node .ring-icon svg,
+    .circle-node.main-node .ring-icon i[data-lucide]{ stroke:#14532d; }
+    .circle-node.main-node .node-label{
+        font-size:.82rem; color:#14532d; background:#fff7d6;
+        padding:2px 10px; border-radius:9999px; border:1.5px solid #bef264;
+    }
+    @media (min-width:640px){
+        .node-label{ font-size:.85rem; }
+        .circle-node.main-node .node-label{ font-size:.95rem; }
+    }
+
+    /* ---------- Wertversprechen-Icons (Innovation / Talente / Partnerschaften) ---------- */
+    .value-icon-panel{
+        position:relative; width:88%; height:80px; border-radius:1.1rem;
+        background:linear-gradient(135deg, var(--kiwi-50), #eafccb);
+        border:1px solid rgba(124,192,22,.25);
+        display:flex; align-items:center; justify-content:center;
+        overflow:hidden; margin:0 auto 1.4rem auto;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .value-icon-panel svg{ width:92%; height:72%; display:block; }
+    .value-icon-panel .icon-shine{
+        position:absolute; top:0; left:0; width:32%; height:100%;
+        background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.9) 50%, transparent 100%);
+        transform:translateX(-220%);
+        animation:iconShineSweep 5.5s ease-in-out infinite;
+        pointer-events:none;
+    }
+    @keyframes iconShineSweep{
+        0%{ transform:translateX(-220%); }
+        18%{ transform:translateX(-220%); }
+        45%{ transform:translateX(280%); }
+        100%{ transform:translateX(280%); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .value-icon-panel .icon-shine{ animation:none; opacity:0; }
+    }
+
+    /* ---------- Mobile: Kreisgrafik-Labels bekommen alle einen Hintergrund und rücken
+       näher an ihren Kreis heran (leichtes Überlappen), damit nichts mehr "verschluckt" wird ---------- */
+    @media (max-width:767px){
+        .circle-node .node-inner{ gap:0; }
+        .node-label{
+            margin-top:-10px;
+            background:#fff7d6;
+            border:1.5px solid #bef264;
+            padding:2px 8px;
+            border-radius:9999px;
+            position:relative;
+            z-index:8;
+            font-size:.62rem;
+            white-space:nowrap;
+        }
+        .circle-node.main-node .node-label{
+            margin-top:-12px;
+            font-size:.68rem;
+        }
+
+        /* 8 Kreise etwas kleiner, nur mobile */
+        .circle-node{ width:80px; }
+        .ring-icon{ width:52px; height:52px; }
+        .ring-icon svg{ width:22px; height:22px; }
+        .circle-node.main-node .ring-icon{ width:68px; height:68px; }
+    }
+
+    /* ---------- Timeline ---------- */
+    .timeline-dot{
+        width:14px; height:14px; border-radius:9999px;
+        background:linear-gradient(135deg,var(--kiwi-500),var(--emerald-500));
+        box-shadow:0 0 0 5px rgba(124,192,22,.15);
+    }
+
+    .kicker{
+        font-size:.72rem; letter-spacing:.16em; font-weight:700; text-transform:uppercase; color:var(--kiwi-600);
+    }
+
+    /* ---------- Hängendes Schild unterm Logo ---------- */
+    .hanging-sign-anchor{ z-index:40; }
+    /* Zentrierung ausschließlich hier (wird NIE von einer Animation überschrieben) */
+    .hanging-sign-center{
+        position:absolute; left:50%; top:100%; transform:translateX(-50%);
+        z-index:40;
+    }
+    /* Mobile: Schild hängt links bündig unterm Logo und verlängert sich nach rechts */
+    .hanging-sign-center-mobile{
+        position:absolute; left:0; top:100%;
+        z-index:40;
+    }
+    /* Gummiband + Badge sollen links (bei x=0, wo die Logo-Kurve beginnt) hängen,
+       statt unter der Mitte des gesamten Schilds zentriert zu sein. */
+    .hanging-sign-center-mobile .hanging-sign,
+    .hanging-sign-center-mobile .sign-link{
+        align-items:flex-start;
+    }
+    /* Äußerer Rahmen: nur fürs Einblenden zuständig, damit Zentrierung nie verrutscht */
+    .hanging-sign{
+        display:flex; flex-direction:column; align-items:center;
+        opacity:0;
+        transition:opacity .3s ease;
+    }
+    .hanging-sign.is-visible{ opacity:1; }
+    /* Jedes Schild-Glied (Gummiband + Badge) baumelt unabhängig von den anderen */
+    .sign-link{
+        display:flex; flex-direction:column; align-items:center;
+        transform-origin:top center;
+        opacity:0;
+    }
+    .hanging-sign-strings{
+        display:flex; gap:16px; height:14px;
+    }
+    .hanging-sign-strings span{
+        width:2px; height:14px; border-radius:2px;
+        background:linear-gradient(to bottom, var(--kiwi-500), var(--emerald-500));
+    }
+    .hanging-sign-badge{
+        margin-top:-1px;
+        display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+        padding:6px 14px; border-radius:9999px;
+        background:#fff; border:1px solid #bbe98a; color:var(--kiwi-600);
+        font-size:.68rem; font-weight:700;
+        box-shadow:0 6px 14px -6px rgba(16,21,26,.2);
+    }
+    /* Desktop: Badges ca. doppelt so groß + oberstes Gummiband ca. doppelt so lang */
+    @media (min-width:768px){
+        .hanging-sign-chain .hanging-sign-badge{
+            padding:12px 26px;
+            font-size:1.3rem;
+            gap:10px;
+            border-width:1.5px;
+        }
+        .hanging-sign-chain .sign-string-top{ height:28px; }
+        .hanging-sign-chain .sign-string-top span{ height:28px; width:3px; }
+        .hanging-sign-chain .hanging-sign-strings span{ width:3px; }
+    }
+    @keyframes signDropIn{
+        0%{ opacity:0; transform:translateY(-24px) rotate(0deg); }
+        10%{ opacity:1; transform:translateY(6px) rotate(2deg); }
+        22%{ transform:translateY(-4px) rotate(9deg); }
+        34%{ transform:translateY(0) rotate(-8deg); }
+        46%{ transform:translateY(0) rotate(6deg); }
+        58%{ transform:translateY(0) rotate(-4deg); }
+        70%{ transform:translateY(0) rotate(2.5deg); }
+        82%{ transform:translateY(0) rotate(-1.2deg); }
+        92%{ transform:translateY(0) rotate(.5deg); }
+        100%{ opacity:1; transform:translateY(0) rotate(0deg); }
+    }
+    @keyframes signGust{
+        0%{ transform:rotate(0deg); }
+        16%{ transform:rotate(6deg); }
+        38%{ transform:rotate(-5deg); }
+        58%{ transform:rotate(3deg); }
+        76%{ transform:rotate(-1.5deg); }
+        90%{ transform:rotate(.6deg); }
+        100%{ transform:rotate(0deg); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .hanging-sign, .sign-link{ animation:none !important; opacity:1; transform:none; }
+    }
+
+    /* ---------- Offizielles Prüfsiegel (ersetzt die 3-Schilder-Kette am Desktop) ---------- */
+    .official-seal{
+        position:relative;
+        width:190px; height:190px;
+        border-radius:50%;
+        overflow:hidden;
+    }
+    .official-seal-svg{ width:100%; height:100%; display:block; }
+    .official-seal-svg .syn-line{ animation:synapseFlow 3.4s ease-in-out infinite; }
+    .official-seal-svg .syn-node{ animation:synapsePulse 3.4s ease-in-out infinite; }
+    @keyframes synapseFlow{ 0%,100%{ opacity:.18; } 50%{ opacity:.7; } }
+    @keyframes synapsePulse{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
+    @media (prefers-reduced-motion: reduce){
+        .official-seal-svg .syn-line, .official-seal-svg .syn-node{ animation:none; opacity:.4; }
+    }
+</style>
+</head>
+<body class="antialiased selection:bg-lime-300 selection:text-slate-900">
+
+<!-- KIWI SLICE HEADER DEKORATION -->
+<div class="fixed top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-[5]">
+    <div class="kiwi-slice-header"></div>
+</div>
+
+<!-- SEEDS PARTIKEL CONTAINER -->
+<div id="seeds-container"></div>
+
+<div class="ambient">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<div class="relative z-10 flex flex-col min-h-screen w-full">
+
+    <!-- NAV -->
+    <nav class="border-b border-slate-200/70 bg-white/75 backdrop-blur-md sticky top-0 z-50 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="hanging-sign-anchor flex items-center gap-0.5 relative">
+                <span class="bg-gradient-to-br from-lime-400 to-emerald-500 text-[#0d1a0a] px-2.5 py-1 rounded-lg font-black text-base tracking-tight shadow-md shadow-emerald-400/25">kiwi</span>
+                <span class="text-base font-black tracking-tight text-slate-900 pl-1.5">hub</span>
+
+                <!-- Desktop: EIN offizielles Prüfsiegel mit Synapsen-Animation im Hintergrund -->
+                <div class="hanging-sign-center hidden md:block">
+                    <div class="hanging-sign hanging-sign-chain">
+                        <div class="sign-link">
+                            <div class="hanging-sign-strings sign-string-top">
+                                <span></span>
+                            </div>
+                            <div class="official-seal">
+                                <svg class="official-seal-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <path id="sealTopArc" d="M 30,100 A 70,70 0 0 1 170,100" />
+                                        <path id="sealBottomArc" d="M 20,100 A 80,80 0 0 0 180,100" />
+                                        <radialGradient id="sealBg" cx="50%" cy="38%" r="65%">
+                                            <stop offset="0%" stop-color="#f4fce8"/>
+                                            <stop offset="55%" stop-color="#e5f9d2"/>
+                                            <stop offset="100%" stop-color="#d3f2b8"/>
+                                        </radialGradient>
+                                        <clipPath id="sealClip"><circle cx="100" cy="100" r="90"/></clipPath>
+                                        <mask id="kiMask">
+                                            <rect x="0" y="0" width="200" height="200" fill="#fff"/>
+                                            <text x="100" y="112" font-size="60" font-weight="900" text-anchor="middle" fill="#000">KI</text>
+                                        </mask>
+                                    </defs>
+
+                                    <g mask="url(#kiMask)">
+                                        <circle cx="100" cy="100" r="94" fill="url(#sealBg)"/>
+                                        <g clip-path="url(#sealClip)">
+                                            <g stroke="#7cc016" stroke-width="1.2">
+                                                <line class="syn-line" x1="36" y1="50" x2="88" y2="88" style="animation-delay:0s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="148" y2="56" style="animation-delay:.3s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="64" y2="148" style="animation-delay:.6s"/>
+                                                <line class="syn-line" x1="88" y1="88" x2="140" y2="142" style="animation-delay:.9s"/>
+                                                <line class="syn-line" x1="148" y1="56" x2="168" y2="108" style="animation-delay:.45s"/>
+                                                <line class="syn-line" x1="64" y1="148" x2="140" y2="142" style="animation-delay:1.2s"/>
+                                                <line class="syn-line" x1="36" y1="50" x2="30" y2="114" style="animation-delay:.75s"/>
+                                            </g>
+                                            <g fill="#22b56b">
+                                                <circle class="syn-node" cx="36" cy="50" r="4" style="animation-delay:0s"/>
+                                                <circle class="syn-node" cx="88" cy="88" r="5.5" style="animation-delay:.2s"/>
+                                                <circle class="syn-node" cx="148" cy="56" r="4" style="animation-delay:.4s"/>
+                                                <circle class="syn-node" cx="64" cy="148" r="4" style="animation-delay:.6s"/>
+                                                <circle class="syn-node" cx="140" cy="142" r="4" style="animation-delay:.8s"/>
+                                                <circle class="syn-node" cx="168" cy="108" r="3.5" style="animation-delay:1s"/>
+                                                <circle class="syn-node" cx="30" cy="114" r="3.5" style="animation-delay:1.2s"/>
+                                            </g>
+                                        </g>
+                                        <circle cx="100" cy="100" r="94" fill="none" stroke="#15803d" stroke-width="4"/>
+                                        <circle cx="100" cy="100" r="82" fill="none" stroke="#15803d" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.55"/>
+                                    </g>
+
+                                    <!-- feine gravierte Kontur um den KI-Ausschnitt -->
+                                    <text x="100" y="112" font-size="60" font-weight="900" text-anchor="middle" fill="none" stroke="#14532d" stroke-width="0.75" opacity="0.35">KI</text>
+
+                                    <text font-size="16.5" font-weight="800" letter-spacing="1.5" fill="#14532d">
+                                        <textPath href="#sealTopArc" startOffset="50%" text-anchor="middle">EUROPAWEITES</textPath>
+                                    </text>
+
+                                    <text font-size="13.5" font-weight="800" letter-spacing="0.6" fill="#14532d">
+                                        <textPath href="#sealBottomArc" startOffset="50%" text-anchor="middle">INNOVATIONSÖKOSYSTEM</textPath>
+                                    </text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#funktion" class="hover:text-slate-900 transition-colors">So funktioniert's</a>
+                <a href="#warum" class="hover:text-slate-900 transition-colors">Warum KiwiHub</a>
+                <a href="#zielgruppen" class="hover:text-slate-900 transition-colors">Für wen</a>
+                <a href="#vision" class="hover:text-slate-900 transition-colors">Vision</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="md:hidden inline-flex items-center gap-1.5 rounded-full bg-white border border-lime-300 text-emerald-700 px-2.5 py-1.5 shadow-sm max-w-[150px]">
+                    <i data-lucide="sparkles" class="w-3 h-3 shrink-0"></i>
+                    <span class="text-[10px] font-bold leading-tight">Europaweites KI innovationsökosystem</span>
+                </div>
+                <button class="hidden sm:inline text-sm font-semibold text-slate-600 hover:text-slate-900 transition">Anmelden</button>
+                <a href="#cta" class="hidden md:inline-block btn-primary text-sm font-bold px-4 sm:px-5 py-2.5 rounded-lg">KI-Innovation starten</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="relative px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-28 sm:pb-24 flex flex-col items-center text-center w-full overflow-hidden">
+        <!-- CANVAS für interaktiven Kiwi-Shader (deckt die gesamte Hero-Section ab) -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- Grüne animierte Welle am unteren Rand des Shaders / der Hero-Section -->
+        <svg class="wave-line-svg" viewBox="0 0 1920 100" preserveAspectRatio="none" style="bottom:0;">
+            <path class="wave-back" d="M0,42 C 120,34 240,50 480,42 C 600,34 720,50 960,42 C 1080,34 1200,50 1440,42 C 1560,34 1680,50 1920,42 L1920,62 C 1800,54 1680,70 1440,62 C 1320,54 1200,70 960,62 C 840,54 720,70 480,62 C 360,54 240,70 0,62 Z" fill="#22c55e" opacity="0.3" />
+            <path class="wave-front" d="M0,48 C 120,42 240,54 480,48 C 600,42 720,54 960,48 C 1080,42 1200,54 1440,48 C 1560,42 1680,54 1920,48 L1920,64 C 1800,58 1680,70 1440,64 C 1320,58 1200,70 960,64 C 840,58 720,70 480,64 C 360,58 240,70 0,64 Z" fill="#84cc16" opacity="0.6" />
+        </svg>
+
+        <div class="relative z-10 max-w-4xl mx-auto bg-white/55 backdrop-blur-sm p-8 sm:p-14 rounded-2xl border-2 border-slate-200/80 shadow-lg reveal is-visible -mt-[70px]">
+            <h1 class="max-w-4xl mx-auto text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] text-slate-900 mb-7">
+                Lösen Sie Ihre nächste <span class="grad-text">Innovationsfrage</span> mit Europas Hochschulen.
+            </h1>
+
+            <p class="max-w-2xl mx-auto text-lg sm:text-xl text-slate-600 font-medium leading-relaxed mb-10">
+                Unternehmen bringen reale Herausforderungen. Hochschulen integrieren sie in Seminare.
+                Studierende entwickeln mit modernster KI die Lösungen von morgen.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#cta" class="btn-primary font-bold text-base px-7 py-3.5 rounded-xl inline-flex items-center gap-2">
+                    KI-Innovation starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+                <a href="#funktion" class="btn-secondary font-bold text-base px-7 py-3.5 rounded-xl text-slate-700 bg-white/70">
+                    So funktioniert KiwiHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- SO FUNKTIONIERT KIWIHUB -->
+    <section id="funktion" class="relative w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-[#fafaf8]/90 backdrop-blur-md border-y border-slate-200/70">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Der Ablauf</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">So funktioniert KiwiHub</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-14">
+            <div>
+            <!-- KREISLAUF – auf allen Bildschirmgrößen sichtbar -->
+            <div class="reveal">
+                <div class="circle-flow mx-auto">
+                    <div class="mega-background-layer">
+                        <div id="circle-kiwi-slice" class="kiwi-slice"></div>
+                        <div class="blob blob-1"></div>
+                        <div class="blob blob-2"></div>
+                    </div>
+
+                    <svg viewBox="0 0 400 400" class="circle-track" id="circle-lines"></svg>
+
+                    <div class="text-content">
+                        <b>kiwihub</b><br>
+                        ökosystem<br>
+                        für ki-<br>
+                        <span class="word-wrapper">
+                            <ul class="word-list">
+                                <li>wissen</li>
+                                <li>wirtschaft</li>
+                                <li>wissenschaft</li>
+                                <li>wirkung</li>
+                                <li>wissen</li>
+                            </ul>
+                        </span>
+                    </div>
+
+                    <div id="circle-nodes-container"></div>
+                </div>
+            </div>
+            </div>
+
+            <div class="text-left reveal">
+                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mb-5 leading-tight">
+                    Aus einer <span class="pop">Innovationsfrage</span> wird ein offener Innovationsprozess.
+                </h3>
+                <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-5">
+                    Ihre Fragestellung wird in Lehrveranstaltungen mehrerer Hochschulen integriert und von <strong class="text-slate-800">interdisziplinären Studierendenteams</strong> bearbeitet. Unterstützt durch <span class="pop">modernste KI-Werkzeuge</span> und wissenschaftlich begleitet entstehen unterschiedliche Lösungsansätze, neue Perspektiven und erste Prototypen für reale unternehmerische Fragestellungen.
+                </p>
+                <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-6">
+                    Für Ihr Unternehmen bedeutet das mehr als ein einzelnes Projektergebnis: Sie erhalten Zugang zu kreativen Ideen, lernen potenzielle Nachwuchskräfte frühzeitig kennen, knüpfen Kontakte zu führenden Lehrstühlen und schaffen die Grundlage für <strong class="text-slate-800">Pilotprojekte, Forschungskooperationen</strong> oder Ausgründungen.
+                </p>
+                <p class="text-lg sm:text-xl font-black grad-text leading-snug">
+                    Eine Innovationsfrage. Viele Perspektiven. Nachhaltiger Innovationsvorsprung.
+                </p>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WARUM KIWIHUB -->
+    <section id="warum" class="relative w-full py-16 sm:py-24">
+        <canvas id="nutzen-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+        <!-- Grüne Wellenlinie am Anfang der Sektion -->
+        <svg class="wave-line-svg" viewBox="0 0 1920 100" preserveAspectRatio="none" style="top:-60px;">
+            <path class="wave-back" d="M0,42 C 120,34 240,50 480,42 C 600,34 720,50 960,42 C 1080,34 1200,50 1440,42 C 1560,34 1680,50 1920,42 L1920,62 C 1800,54 1680,70 1440,62 C 1320,54 1200,70 960,62 C 840,54 720,70 480,62 C 360,54 240,70 0,62 Z" fill="#22c55e" opacity="0.3" />
+            <path class="wave-front" d="M0,48 C 120,42 240,54 480,48 C 600,42 720,54 960,48 C 1080,42 1200,54 1440,48 C 1560,42 1680,54 1920,48 L1920,64 C 1800,58 1680,70 1440,64 C 1320,58 1200,70 960,64 C 840,58 720,70 480,64 C 360,58 240,70 0,64 Z" fill="#84cc16" opacity="0.6" />
+        </svg>
+
+        <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Der Nutzen</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mb-4">Warum KiwiHub?</h2>
+                <p class="text-base sm:text-lg text-slate-600 font-medium max-w-2xl mx-auto">Aus einer Innovationsfrage entsteht messbarer Mehrwert für Ihr Unternehmen.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="glass-card rounded-2xl p-7 reveal">
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradInno" x1="0" y1="0" x2="260" y2="90" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#7cc016"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M60 45 C 90 20, 118 20, 140 32" stroke="url(#gradInno)" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M60 45 C 90 55, 113 62, 138 55" stroke="url(#gradInno)" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+                            <circle cx="40" cy="45" r="10" fill="url(#gradInno)"/>
+                            <g stroke="url(#gradInno)" stroke-width="4" stroke-linecap="round">
+                                <line x1="151" y1="19" x2="169" y2="7"/>
+                                <line x1="161" y1="30" x2="184" y2="21"/>
+                                <line x1="166" y1="45" x2="192" y2="45"/>
+                                <line x1="161" y1="60" x2="184" y2="69"/>
+                                <line x1="151" y1="71" x2="169" y2="83"/>
+                            </g>
+                            <circle cx="150" cy="45" r="17" fill="url(#gradInno)" opacity="0.15"/>
+                            <circle cx="150" cy="45" r="9" fill="url(#gradInno)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:0s"></div>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Innovation</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Erhalten Sie <strong class="text-emerald-600 font-bold">zahlreiche unabhängige Lösungsansätze</strong> für reale Fragestellungen – entwickelt von Studierenden mehrerer Hochschulen mit Unterstützung <strong class="text-emerald-600 font-bold">modernster KI</strong>.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.05s">
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradTal" x1="0" y1="90" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#5fa012"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M20 70 C 70 70, 70 45, 110 45 C 150 45, 150 22, 190 22 C 210 22, 220 15, 235 12"
+                                  stroke="url(#gradTal)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 10"/>
+                            <circle cx="20" cy="70" r="7" fill="url(#gradTal)"/>
+                            <circle cx="110" cy="45" r="9" fill="url(#gradTal)"/>
+                            <circle cx="190" cy="22" r="11" fill="url(#gradTal)"/>
+                            <circle cx="235" cy="12" r="13" fill="url(#gradTal)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:1.1s"></div>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Talente</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Lernen Sie <strong class="text-emerald-600 font-bold">zukünftige Fach- und Führungskräfte</strong> bereits während ihrer Projektarbeit kennen und gewinnen Sie Zugang zu den <strong class="text-emerald-600 font-bold">klügsten Köpfen von morgen</strong>.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.1s">
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradPart" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#7cc016"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="70" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5"/>
+                            <circle cx="130" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5" opacity="0.85"/>
+                            <circle cx="190" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5" opacity="0.7"/>
+                            <circle cx="130" cy="45" r="4" fill="url(#gradPart)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:2.2s"></div>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-2">Partnerschaften</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Knüpfen Sie <strong class="text-emerald-600 font-bold">langfristige Verbindungen</strong> zu Hochschulen, Lehrstühlen und Forschungseinrichtungen – als Grundlage für <strong class="text-emerald-600 font-bold">gemeinsame Projekte, Forschung und Innovation</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grüne Wellenlinie am Ende der Sektion -->
+        <svg class="wave-line-svg" viewBox="0 0 1920 100" preserveAspectRatio="none" style="bottom:-45px;">
+            <path class="wave-back" d="M0,42 C 120,34 240,50 480,42 C 600,34 720,50 960,42 C 1080,34 1200,50 1440,42 C 1560,34 1680,50 1920,42 L1920,62 C 1800,54 1680,70 1440,62 C 1320,54 1200,70 960,62 C 840,54 720,70 480,62 C 360,54 240,70 0,62 Z" fill="#22c55e" opacity="0.3" />
+            <path class="wave-front" d="M0,48 C 120,42 240,54 480,48 C 600,42 720,54 960,48 C 1080,42 1200,54 1440,48 C 1560,42 1680,54 1920,48 L1920,64 C 1800,58 1680,70 1440,64 C 1320,58 1200,70 960,64 C 840,58 720,70 480,64 C 360,58 240,70 0,64 Z" fill="#84cc16" opacity="0.6" />
+        </svg>
+    </section>
+
+
+    <!-- FÜR WEN -->
+    <section id="zielgruppen" class="relative w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-[#fafaf8]/90 backdrop-blur-md border-y border-slate-200/70">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <p class="kicker mb-3">Mitmachen</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">Für wen ist KiwiHub?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col reveal">
+                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80" alt="Industriepartner im Meeting" class="w-full h-44 object-cover">
+                    <div class="p-8 flex flex-col flex-grow">
+                        <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                            <i data-lucide="factory" class="w-6 h-6 text-lime-600"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Für Unternehmen</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Veröffentlichen Sie reale Herausforderungen und erhalten Sie innovative Lösungen aus Europas Hochschulen.</p>
+                        <a href="#" class="btn-primary font-bold text-sm px-5 py-3 rounded-xl text-center">Innovationsfrage veröffentlichen</a>
+                    </div>
+                </div>
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col reveal" style="transition-delay:.05s">
+                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80" alt="Lehrkraft hält ein Seminar" class="w-full h-44 object-cover">
+                    <div class="p-8 flex flex-col flex-grow">
+                        <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                            <i data-lucide="graduation-cap" class="w-6 h-6 text-lime-600"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Für Hochschulen</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Integrieren Sie Praxisprojekte in Ihre Lehre und ermöglichen Sie Studierenden echte Innovationserfahrung.</p>
+                        <a href="#" class="btn-secondary font-bold text-sm px-5 py-3 rounded-xl text-center text-slate-700 bg-white">Seminar eintragen</a>
+                    </div>
+                </div>
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col reveal" style="transition-delay:.1s">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80" alt="Studierende arbeiten gemeinsam an einem Projekt" class="w-full h-44 object-cover">
+                    <div class="p-8 flex flex-col flex-grow">
+                        <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center mb-5">
+                            <i data-lucide="user-round" class="w-6 h-6 text-lime-600"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Für Studierende</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-8 flex-grow">Bearbeiten Sie reale Industrie-Challenges, bauen Sie Ihr Portfolio auf und werden Sie von Unternehmen entdeckt.</p>
+                        <a href="#" class="btn-secondary font-bold text-sm px-5 py-3 rounded-xl text-center text-slate-700 bg-white">Projekt eintragen</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISION -->
+    <section id="vision" class="relative w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-[#fafaf8]/90 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="kicker mb-3 reveal">KiwiHub Ökosystem</p>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-6 reveal">
+                Wir bauen eine Europaweite Infrastruktur für KI-gestützte Innovation.
+            </h2>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto mb-16 reveal">
+                KiwiHub verbindet Unternehmen, Hochschulen und Studierende zu einem gemeinsamen Innovationsnetzwerk.
+                Reale Herausforderungen werden zu Lehrprojekten. Lehrprojekte werden zu Innovationen.
+                Innovationen werden zu Forschung, Talenten und neuen Unternehmen.
+            </p>
+
+            <!-- PORTFOLIO REIHE 1: INDUSTRIEPARTNER -->
+            <div class="text-left mb-14 reveal">
+                <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-6">Industriepartner</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="Industriepartner 1" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Industriepartner 1 GmbH</p>
+                            <p class="text-sm text-slate-500">Automatisierung &amp; Robotik</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80" alt="Industriepartner 2" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Industriepartner 2 AG</p>
+                            <p class="text-sm text-slate-500">Nachhaltige Logistik</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80" alt="Industriepartner 3" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Industriepartner 3 SE</p>
+                            <p class="text-sm text-slate-500">Data Analytics &amp; KI</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PORTFOLIO REIHE 2: LEHRSTÜHLE -->
+            <div class="text-left mb-14 reveal">
+                <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-6">Lehrstühle an Hochschulen</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80" alt="Lehrstuhl für Maschinelles Lernen" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Lehrstuhl für Maschinelles Lernen</p>
+                            <p class="text-sm text-slate-500">Technische Universität Stadt1</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1606206873764-fd15e242df52?w=800&q=80" alt="Lehrstuhl für Nachhaltige Produktionstechnik" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Lehrstuhl für Nachhaltige Produktionstechnik</p>
+                            <p class="text-sm text-slate-500">Universität Stadt2</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80" alt="Lehrstuhl für Human-Centered AI" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Lehrstuhl für Human-Centered AI</p>
+                            <p class="text-sm text-slate-500">Universität Stadt3</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PORTFOLIO REIHE 3: STUDENTENARBEITEN -->
+            <div class="text-left reveal">
+                <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-6">Studentenarbeiten</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80" alt="KI-gestützte Ernteprognose" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">KI-gestützte Ernteprognose</p>
+                            <p class="text-sm text-slate-500">Studierendenteam, Agrar &amp; Data Science</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80" alt="Autonomer Lagerroboter" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Autonomer Lagerroboter</p>
+                            <p class="text-sm text-slate-500">Prototyp, Maschinenbau &amp; Robotik</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80" alt="Chatbot für barrierefreie Bildung" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <p class="font-black text-slate-900">Chatbot für barrierefreie Bildung</p>
+                            <p class="text-sm text-slate-500">Prototyp, Informatik &amp; Pädagogik</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta" class="relative w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-gradient-to-br from-lime-400 to-emerald-500 overflow-hidden">
+        <canvas id="cta-synapse-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+        <div class="relative z-10 max-w-3xl mx-auto text-center reveal">
+            <h2 class="text-3xl sm:text-5xl font-black text-[#0d1a0a] leading-tight mb-5">Werden Sie Gründungspartner von kiwihub.</h2>
+            <p class="text-lg text-[#0d1a0a]/80 font-medium mb-10">Wir suchen 2–3 Pilotunternehmen für die erste Runde – eine reale, aber nicht geschäftskritische Fragestellung reicht zum Start.</p>
+            <a href="#" class="inline-flex items-center gap-2 bg-[#0d1a0a] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#182b16] transition-colors shadow-lg shadow-black/10">
+                Jetzt KI-Innovation starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full border-t border-slate-200 bg-white py-10 text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="font-semibold text-slate-600">kiwihub — Europas KI-Innovationsökosystem für Unternehmen und Hochschulen.</p>
+            <div class="flex gap-6 font-semibold">
+                <a href="#" class="hover:text-lime-600 transition">Impressum</a>
+                <a href="#" class="hover:text-lime-600 transition">Datenschutz</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TRUST BAR (unter dem Footer) -->
+    <div class="w-full bg-[#101c12] text-white/90 text-xs sm:text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-center">
+            <span class="font-semibold">In Gründung – gemeinsam mit einem ersten Hochschul-Lehrstuhl</span>
+            <span class="hidden sm:inline text-white/30">•</span>
+            <span class="text-white/70">Erste Industriepartner gesucht</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // ===== HÄNGENDE SCHILDER: Drop-In-Bounce nach 3s, dann Wind-Baumeln bei Hover =====
+    // Jedes Schild (sign-link) baumelt unabhängig von den anderen, auch wenn sie
+    // optisch aneinander/an der Navbar hängen - daher eigene, leicht versetzte Animation je Glied.
+    (function () {
+        const anchor = document.querySelector('.hanging-sign-anchor');
+        if (!anchor) return;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        anchor.querySelectorAll('.hanging-sign').forEach((sign) => {
+            const links = Array.from(sign.querySelectorAll('.sign-link'));
+            if (!links.length) return;
+
+            if (reduceMotion) {
+                sign.style.opacity = '1';
+                links.forEach((link) => { link.style.opacity = '1'; });
+                return;
+            }
+
+            let introDone = false;
+
+            function playIntro() {
+                sign.classList.add('is-visible');
+                links.forEach((link, i) => {
+                    link.style.opacity = '0';
+                    setTimeout(() => {
+                        link.style.animation = 'signDropIn 2.3s cubic-bezier(.34,1.2,.64,1) forwards';
+                    }, i * 140);
+                });
+            }
+
+            let pending = links.length;
+            links.forEach((link) => {
+                link.addEventListener('animationend', function onIntroEnd(e) {
+                    if (e.animationName === 'signDropIn') {
+                        link.style.animation = 'none';
+                        link.style.opacity = '1';
+                        link.style.transform = 'rotate(0deg)';
+                        link.removeEventListener('animationend', onIntroEnd);
+                        pending -= 1;
+                        if (pending <= 0) introDone = true;
+                    }
+                });
+            });
+            setTimeout(playIntro, 3000);
+
+            anchor.addEventListener('mouseenter', () => {
+                if (!introDone) return; // während des Einbaumelns nicht unterbrechen
+                links.forEach((link, i) => {
+                    setTimeout(() => {
+                        link.style.animation = `signGust ${1.1 + i * 0.15}s ease-in-out`;
+                    }, i * 90);
+                });
+            });
+            links.forEach((link) => {
+                link.addEventListener('animationend', (e) => {
+                    if (e.animationName === 'signGust') {
+                        link.style.animation = 'none';
+                        link.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+        });
+    })();
+
+    // ===== NEUE KREISGRAFIK "SO FUNKTIONIERT KIWIHUB" =====
+    // 8 Stationen im Kreis, 4 Hauptknoten (oben/rechts/unten/links) pulsieren nacheinander
+    // und die Verbindungslinie wandert mit, bevor der ganze Ring weich ausgeblendet und neu gestartet wird.
+    (function () {
+        const container = document.getElementById('circle-nodes-container');
+        const svg = document.getElementById('circle-lines');
+        const kiwiSlice = document.getElementById('circle-kiwi-slice');
+        if (!container || !svg || !kiwiSlice) return;
+
+        const nodesData = ["Unternehmen", "Innovationsfrage", "Hochschulen", "KI-Seminare", "Studierende", "Ideen & Prototypen", "Gewinner", "Praktikum & Pilot"];
+        const icons = ["factory", "target", "graduation-cap", "brain", "users", "lightbulb", "trophy", "rocket"];
+        // Indizes 0,2,4,6 entsprechen oben, rechts, unten, links -> hervorgehoben UND animiert (pulsieren)
+        const mainIndices = [0, 2, 4, 6];
+
+        function initCircle() {
+            const R = 135; // Radius
+            const K = 330; // Kiwi-Größe
+
+            const G = 0.4;          // Wachsen eines Knotens
+            const H = 2.0;          // groß bleiben + Linie wandert zum nächsten Hauptknoten
+            const S = 0.4;          // Schrumpfen eines Knotens
+            const SLOT = G + H;     // Zeit bis der nächste Hauptknoten startet (2.4s)
+            const CLOSE_G = 0.4;    // Extra-Puls des obersten Kreises: Wachsen
+            const CLOSE_HOLD = 3;   // ... 3s groß bleiben
+            const CLOSE_S = 0.4;    // ... Schrumpfen
+            const FADE = 0.8;       // gemeinsames weiches Ausblenden des Rings
+
+            const N = mainIndices.length; // 4 aktive Hauptknoten
+            const CLOSE_TIME = SLOT * N;  // Moment, in dem sich der Kreis schließt
+            const CLOSE_END = CLOSE_TIME + CLOSE_G + CLOSE_HOLD + CLOSE_S;
+            const TOTAL = CLOSE_END + FADE; // voller Umlauf
+
+            kiwiSlice.style.width = K + 'px';
+            kiwiSlice.style.height = K + 'px';
+
+            container.innerHTML = '';
+            svg.innerHTML = '';
+
+            const oldStyle = document.getElementById('dynamic-circle-anim-styles');
+            if (oldStyle) oldStyle.remove();
+            const dynStyle = document.createElement('style');
+            dynStyle.id = 'dynamic-circle-anim-styles';
+
+            const pct = (sec) => (sec / TOTAL * 100).toFixed(4);
+
+            let css = '';
+
+            // --- Hauptknoten (außer dem obersten): ein Puls pro Zyklus ---
+            for (let pos = 1; pos < N; pos++) {
+                const idx = mainIndices[pos];
+                const start = pos * SLOT;
+                const growEnd = start + G;
+                const holdEnd = growEnd + H;
+                const shrinkEnd = holdEnd + S;
+
+                css += `
+                @keyframes circleNodePulse${idx} {
+                    0% { transform: scale(1); }
+                    ${pct(start)}% { transform: scale(1); }
+                    ${pct(growEnd)}% { transform: scale(1.18); }
+                    ${pct(holdEnd)}% { transform: scale(1.18); }
+                    ${pct(shrinkEnd)}% { transform: scale(1); }
+                    100% { transform: scale(1); }
+                }
+                @keyframes circleShineSweep${idx} {
+                    0% { opacity: 0; transform: translateX(-160%); }
+                    ${pct(start)}% { opacity: 0; transform: translateX(-160%); }
+                    ${pct(growEnd)}% { opacity: 1; transform: translateX(-160%); }
+                    ${pct(holdEnd)}% { opacity: 1; transform: translateX(160%); }
+                    ${pct(holdEnd + 0.05)}% { opacity: 0; transform: translateX(160%); }
+                    100% { opacity: 0; transform: translateX(160%); }
+                }`;
+            }
+
+            // --- Oberster Hauptknoten (Index 0): pulsiert am Anfang UND noch einmal beim Schließen
+            //     des Kreises (dann 3s groß bleibend), bevor alles gemeinsam ausgeblendet wird. ---
+            {
+                const growEnd = G;
+                const holdEnd = growEnd + H;
+                const shrinkEnd = holdEnd + S;
+                const closeGrowEnd = CLOSE_TIME + CLOSE_G;
+                const closeHoldEnd = closeGrowEnd + CLOSE_HOLD;
+                const closeShrinkEnd = closeHoldEnd + CLOSE_S;
+
+                css += `
+                @keyframes circleNodePulse0 {
+                    0% { transform: scale(1); }
+                    ${pct(growEnd)}% { transform: scale(1.18); }
+                    ${pct(holdEnd)}% { transform: scale(1.18); }
+                    ${pct(shrinkEnd)}% { transform: scale(1); }
+                    ${pct(CLOSE_TIME)}% { transform: scale(1); }
+                    ${pct(closeGrowEnd)}% { transform: scale(1.22); }
+                    ${pct(closeHoldEnd)}% { transform: scale(1.22); }
+                    ${pct(closeShrinkEnd)}% { transform: scale(1); }
+                    100% { transform: scale(1); }
+                }
+                @keyframes circleShineSweep0 {
+                    0% { opacity: 0; transform: translateX(-160%); }
+                    ${pct(growEnd)}% { opacity: 1; transform: translateX(-160%); }
+                    ${pct(holdEnd)}% { opacity: 1; transform: translateX(160%); }
+                    ${pct(holdEnd + 0.05)}% { opacity: 0; transform: translateX(160%); }
+                    ${pct(CLOSE_TIME)}% { opacity: 0; transform: translateX(-160%); }
+                    ${pct(closeGrowEnd)}% { opacity: 1; transform: translateX(-160%); }
+                    ${pct(closeHoldEnd)}% { opacity: 1; transform: translateX(160%); }
+                    ${pct(closeHoldEnd + 0.05)}% { opacity: 0; transform: translateX(160%); }
+                    100% { opacity: 0; transform: translateX(160%); }
+                }`;
+            }
+
+            // --- Linien: verbinden die 4 Hauptknoten direkt (0->2->4->6->0), bleiben bis zum eigenen
+            //     Auftritt unsichtbar, bauen sich dann in ihrer Haltezeit auf, bleiben stehen, und
+            //     werden zusammen mit allen anderen Linien kurz vor dem Reset weich ausgeblendet. ---
+            const lineKeyframeNames = [];
+            for (let pos = 0; pos < N; pos++) {
+                const turnStart = pos * SLOT + G;
+                const turnEnd = turnStart + H;
+                const name = `circleLineReveal${pos}`;
+                lineKeyframeNames.push(name);
+                css += `
+                @keyframes ${name} {
+                    0% { stroke-dashoffset: 100; }
+                    ${pct(turnStart)}% { stroke-dashoffset: 100; }
+                    ${pct(turnEnd)}% { stroke-dashoffset: 0; }
+                    100% { stroke-dashoffset: 0; }
+                }`;
+            }
+
+            dynStyle.textContent = css;
+            document.head.appendChild(dynStyle);
+
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            svg.appendChild(defs);
+
+            // Alle 8 Kreise anzeigen (für Übersicht), aber nur die 4 Hauptknoten animieren
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * 45) - 90;
+                const x = 200 + R * Math.cos(angle * Math.PI / 180);
+                const y = 200 + R * Math.sin(angle * Math.PI / 180);
+                const isMain = mainIndices.includes(i);
+
+                const node = document.createElement('div');
+                node.className = 'circle-node' + (isMain ? ' main-node' : ' idle-node');
+                node.style.left = (x / 4) + '%';
+                node.style.top = (y / 4) + '%';
+                node.innerHTML = `<div class="node-inner"><div class="ring-icon"><div class="shine"></div><i data-lucide="${icons[i]}"></i></div><span class="node-label">${nodesData[i]}</span></div>`;
+
+                if (isMain) {
+                    const inner = node.querySelector('.node-inner');
+                    const shine = node.querySelector('.shine');
+                    inner.style.animation = `circleNodePulse${i} ${TOTAL}s linear infinite`;
+                    shine.style.animation = `circleShineSweep${i} ${TOTAL}s linear infinite`;
+                }
+                container.appendChild(node);
+            }
+
+            // Linien nur zwischen den 4 Hauptknoten, direkt im Uhrzeigersinn (0->2->4->6->0)
+            for (let pos = 0; pos < N; pos++) {
+                const idxA = mainIndices[pos];
+                const idxB = mainIndices[(pos + 1) % N];
+                const angleA = (idxA * 45) - 90;
+                const angleB = (idxB * 45) - 90 + (idxB <= idxA ? 360 : 0);
+                const xA = 200 + R * Math.cos(angleA * Math.PI / 180);
+                const yA = 200 + R * Math.sin(angleA * Math.PI / 180);
+                const xB = 200 + R * Math.cos(angleB * Math.PI / 180);
+                const yB = 200 + R * Math.sin(angleB * Math.PI / 180);
+                const d = `M ${xA} ${yA} A ${R} ${R} 0 0 1 ${xB} ${yB}`;
+
+                const maskId = 'circle-line-mask-' + pos;
+                const mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+                mask.setAttribute('id', maskId);
+                mask.setAttribute('maskUnits', 'userSpaceOnUse');
+                const maskPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                maskPath.setAttribute('d', d);
+                maskPath.setAttribute('pathLength', '100');
+                maskPath.setAttribute('fill', 'none');
+                maskPath.setAttribute('stroke', 'white');
+                maskPath.setAttribute('stroke-width', '16');
+                maskPath.setAttribute('stroke-linecap', 'round');
+                maskPath.setAttribute('stroke-dasharray', '100 100');
+                maskPath.style.animation = `${lineKeyframeNames[pos]} ${TOTAL}s linear infinite`;
+                mask.appendChild(maskPath);
+                defs.appendChild(mask);
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', d);
+                path.setAttribute('pathLength', '100');
+                path.setAttribute('class', 'flow-line');
+                path.setAttribute('mask', `url(#${maskId})`);
+                path.style.animation = `flowMove 3s linear infinite, lineFadeOut ${TOTAL}s linear infinite`;
+                svg.appendChild(path);
+            }
+
+            lucide.createIcons();
+        }
+
+        initCircle();
+    })();
+
+    // ===== INTERAKTIVER KIWI SHADER (Hero-Hintergrund) =====
+    (function() {
+        const canvas = document.getElementById('bg-canvas');
+        const gl = canvas.getContext('webgl');
+        if (!gl) return;
+
+        const vsSource = `attribute vec4 aVertexPosition; void main() { gl_Position = aVertexPosition; }`;
+        const fsSource = `
+            precision highp float;
+            uniform vec2 iResolution;
+            uniform float iTime;
+            uniform vec2 uMouse;
+            uniform float uCutIntensity;
+            vec2 get_path(float z) {
+                return vec2(sin(z * 0.25) * 1.8, cos(z * 0.15) * 1.2) + (uMouse * 0.5);
+            }
+
+            float smax(float a, float b, float k) {
+                float h = max(k - abs(a - b), 0.0);
+                return max(a, b) + h * h * 0.25 / k;
+            }
+
+            float gyroid(vec3 p) { return dot(sin(p), cos(p.yzx)); }
+
+            float map(vec3 p) {
+                float scale = 0.75;
+                float d = gyroid(p * scale) * 0.7;
+                d += gyroid(p * scale * 2.2 + iTime * 0.25) * 0.25;
+                d = abs(d) - 0.08;
+                vec2 pathPos = get_path(p.z);
+                float distToPath = length(p.xy - pathPos);
+                float safetyTube = 0.5 - distToPath;
+
+                // CUT-PLANE EFFEKT!
+                float cutPlane = p.x - uMouse.x * 0.3;
+                cutPlane = smax(cutPlane, -0.1, 0.2);
+
+                return smax(smax(d, safetyTube, 0.5), cutPlane, 0.3);
+            }
+
+            vec3 getMaterial(vec3 p, vec3 n) {
+                vec3 q = fract(p * 1.8) - 0.5;
+                float pat = length(q);
+                vec3 kiwiFlesh = mix(vec3(0.08, 0.55, 0.12), vec3(0.72, 0.85, 0.35), smoothstep(-0.7, 0.7, sin(p.z * 0.4 + p.y * 0.3)));
+                kiwiFlesh = mix(kiwiFlesh, vec3(0.08, 0.06, 0.06), smoothstep(0.12, 0.16, pat) * smoothstep(0.22, 0.18, pat));
+                float fibers = smoothstep(0.26, 0.3, length(q.xz));
+                kiwiFlesh *= 0.4 + 0.6 * fibers;
+
+                // INTENSIVE CUT-EFFEKTE
+                float cutEffect = smoothstep(0.5, 0.0, length(p.xy - uMouse * 0.5)) * uCutIntensity;
+                float cutGlow = smoothstep(0.2, 0.0, abs(p.x - uMouse.x * 0.3)) * 0.8;
+
+                kiwiFlesh *= mix(1.0, 1.5, cutEffect);
+                kiwiFlesh += vec3(0.9, 1.0, 0.3) * cutGlow * cutEffect * 0.6;
+
+                return kiwiFlesh;
+            }
+
+            void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+                vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+                float tVal = iTime * 0.8;
+                vec3 ro = vec3(get_path(tVal), tVal);
+                vec3 ta = vec3(get_path(tVal + 1.0), tVal + 1.0);
+                vec3 fwd = normalize(ta - ro);
+                vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), fwd));
+                vec3 up = cross(fwd, right);
+                vec3 rd = normalize(fwd + right * uv.x * 1.2 + up * uv.y);
+
+                float t = 0.0;
+                vec3 p = ro;
+                int hit = 0;
+                for(int i = 0; i < 60; i++) {
+                    p = ro + rd * t;
+                    float d = map(p);
+                    if(d < 0.001) { hit = 1; break; }
+                    if(t > 35.0) break;
+                    t += d * 0.65;
+                }
+
+                vec3 backgroundVoid = vec3(0.95, 0.94, 0.92);
+                vec3 col = vec3(0.0);
+
+                if(hit == 1) {
+                    vec2 e = vec2(0.01, 0.0);
+                    vec3 n = normalize(vec3(map(p + e.xyy) - map(p - e.xyy), map(p + e.yxy) - map(p - e.yxy), map(p + e.yyx) - map(p - e.yyx)));
+                    vec3 mat = getMaterial(p, n);
+                    vec3 lightPos = ro + vec3(1.0 + uMouse.x * 0.5, 0.8, 1.5);
+                    vec3 l = normalize(lightPos - p);
+                    float diff = max(dot(n, l), 0.0);
+                    float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 20.0);
+                    float rim = pow(1.0 - max(dot(n, -rd), 0.0), 2.5);
+                    col = mat * (diff * 0.8 + 0.2);
+                    col += vec3(0.9, 1.0, 0.5) * spec * 0.6;
+                    col += vec3(0.5, 0.9, 0.2) * rim * 0.7;
+                    col = mix(col, backgroundVoid, 1.0 - exp(-0.07 * t));
+                } else {
+                    col = backgroundVoid;
+                }
+                fragColor = vec4(col, 1.0);
+            }
+            void main() { mainImage(gl_FragColor, gl_FragCoord.xy); }
+        `;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
+        }
+
+        const program = gl.createProgram();
+        const vShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
+        const fShader = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+        if (vShader && fShader) {
+            gl.attachShader(program, vShader);
+            gl.attachShader(program, fShader);
+            gl.linkProgram(program);
+
+            if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                const uRes = gl.getUniformLocation(program, 'iResolution');
+                const uTime = gl.getUniformLocation(program, 'iTime');
+                const uMouse = gl.getUniformLocation(program, 'uMouse');
+                const uCutIntensity = gl.getUniformLocation(program, 'uCutIntensity');
+
+                const buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1, 1,1, -1,-1, 1,-1]), gl.STATIC_DRAW);
+                const aPos = gl.getAttribLocation(program, 'aVertexPosition');
+                gl.enableVertexAttribArray(aPos);
+                gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+                let tx = 0, ty = 0, cx = 0, cy = 0;
+                let cutIntensity = 0;
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                window.addEventListener('mousemove', (e) => {
+                    tx = (e.clientX / window.innerWidth) * 2 - 1;
+                    ty = -((e.clientY / window.innerHeight) * 2 - 1);
+                    cutIntensity = 1.2;
+
+                    // Massive Seed-Spawn bei Mausbewegung
+                    if (Math.random() > 0.7) spawnSeed(e.clientX, e.clientY);
+                });
+
+                function render(time) {
+                    const rect = canvas.getBoundingClientRect();
+                    const targetW = Math.max(1, Math.round(rect.width));
+                    const targetH = Math.max(1, Math.round(rect.height));
+                    if (canvas.width !== targetW || canvas.height !== targetH) {
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        gl.viewport(0, 0, canvas.width, canvas.height);
+                    }
+                    cx += (tx - cx) * 0.06;
+                    cy += (ty - cy) * 0.06;
+                    cutIntensity *= 0.88;
+
+                    gl.useProgram(program);
+                    gl.uniform2f(uRes, canvas.width, canvas.height);
+                    gl.uniform1f(uTime, time * 0.0015);
+                    gl.uniform2f(uMouse, cx, cy);
+                    gl.uniform1f(uCutIntensity, cutIntensity);
+                    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                    if (!reduceMotion) requestAnimationFrame(render);
+                }
+                requestAnimationFrame(render);
+            }
+        }
+    })();
+
+    // ===== KIWI SEEDS PARTIKEL SYSTEM =====
+    function spawnSeed(x, y) {
+        const container = document.getElementById('seeds-container');
+        if (!container) return;
+        const seed = document.createElement('div');
+        seed.className = 'kiwi-seed seed-float';
+        seed.style.left = x + 'px';
+        seed.style.top = y + 'px';
+
+        const randomTx = (Math.random() - 0.5) * 60;
+        seed.style.setProperty('--tx', randomTx + 'px');
+
+        container.appendChild(seed);
+        setTimeout(() => seed.remove(), 1800);
+    }
+
+    // ===== SCHWARM-ANIMATION HINTERGRUND "DER NUTZEN" =====
+    // Gleiches generatives Partikel-Flow-Field wie ursprünglich im Hero, jetzt als Sektions-Hintergrund.
+    (function () {
+        const canvas = document.getElementById('nutzen-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const section = canvas.parentElement;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let w = 0, h = 0, dpr = 1;
+        let particles = [];
+
+        function spawn() {
+            return {
+                x: Math.random() * w,
+                y: Math.random() * h,
+                life: 80 + Math.random() * 160
+            };
+        }
+
+        function resize() {
+            const rect = section.getBoundingClientRect();
+            if (rect.width < 2 || rect.height < 2) return;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = rect.width;
+            h = rect.height;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.fillStyle = '#fafaf8';
+            ctx.fillRect(0, 0, w, h);
+            if (particles.length === 0) {
+                particles = Array.from({ length: 150 }, spawn);
+            }
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+        if (window.ResizeObserver) {
+            new ResizeObserver(resize).observe(section);
+        }
+
+        let mouse = { x: -9999, y: -9999, active: false };
+
+        function fieldAngle(x, y, t) {
+            return (
+                Math.sin(x * 0.0035 + t) * Math.cos(y * 0.004 - t * 0.8) * Math.PI +
+                Math.sin((x + y) * 0.002 + t * 0.5)
+            );
+        }
+
+        section.addEventListener('mousemove', (e) => {
+            const rect = section.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            mouse.active = true;
+        });
+        section.addEventListener('mouseleave', () => { mouse.active = false; });
+
+        let t = 0;
+        function tick() {
+            if (w > 2 && h > 2 && particles.length) {
+                t += 0.0035;
+                ctx.fillStyle = 'rgba(250,250,248,0.045)';
+                ctx.fillRect(0, 0, w, h);
+
+                particles.forEach((p) => {
+                    let angle = fieldAngle(p.x, p.y, t);
+
+                    if (mouse.active) {
+                        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 170) {
+                            const tangential = Math.atan2(dy, dx) + Math.PI / 2;
+                            const influence = (1 - dist / 170) * 1.4;
+                            angle = angle * (1 - influence) + tangential * influence;
+                        }
+                    }
+
+                    const speed = 1.3;
+                    const nx = p.x + Math.cos(angle) * speed;
+                    const ny = p.y + Math.sin(angle) * speed;
+
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(nx, ny);
+                    ctx.strokeStyle = 'rgba(84,158,20,0.75)';
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+
+                    p.x = nx; p.y = ny; p.life--;
+
+                    if (p.life <= 0 || p.x < 0 || p.x > w || p.y < 0 || p.y > h) {
+                        Object.assign(p, spawn());
+                    }
+                });
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if (!reduceMotion) requestAnimationFrame(tick);
+    })();
+
+    // ===== SYNAPSEN-ANIMATION HINTERGRUND "GRÜNDUNGSPARTNER" (CTA) =====
+    // Lebendiges Partikel-Netz auf dem grünen Verlauf, analog zum Kreis-Vorbild.
+    (function () {
+        const canvas = document.getElementById('cta-synapse-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const section = canvas.parentElement;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let w = 0, h = 0, dpr = 1;
+        let particles = [];
+
+        function spawnParticle() {
+            return {
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5
+            };
+        }
+
+        function resize() {
+            const rect = section.getBoundingClientRect();
+            if (rect.width < 2 || rect.height < 2) return;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = rect.width;
+            h = rect.height;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const count = Math.max(40, Math.min(110, Math.round((w * h) / 9000)));
+            particles = Array.from({ length: count }, spawnParticle);
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+        if (window.ResizeObserver) {
+            new ResizeObserver(resize).observe(section);
+        }
+
+        const LINK_DIST = 100;
+
+        function draw() {
+            if (w > 2 && h > 2 && particles.length) {
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = 'rgba(13,26,10,0.28)';
+                ctx.fillStyle = 'rgba(13,26,10,0.55)';
+
+                particles.forEach((p, i) => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0 || p.y > h) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const q = particles[j];
+                        const dist = Math.hypot(p.x - q.x, p.y - q.y);
+                        if (dist < LINK_DIST) {
+                            ctx.globalAlpha = 1 - dist / LINK_DIST;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(q.x, q.y);
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                        }
+                    }
+                });
+            }
+            requestAnimationFrame(draw);
+        }
+
+        if (!reduceMotion) requestAnimationFrame(draw);
+    })();
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
