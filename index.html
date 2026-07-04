@@ -287,6 +287,33 @@
         .circle-node.main-node .node-label{ font-size:.95rem; }
     }
 
+    /* ---------- Wertversprechen-Icons (Innovation / Talente / Partnerschaften) ---------- */
+    .value-icon-panel{
+        position:relative; width:88%; height:80px; border-radius:1.1rem;
+        background:linear-gradient(135deg, var(--kiwi-50), #eafccb);
+        border:1px solid rgba(124,192,22,.25);
+        display:flex; align-items:center; justify-content:center;
+        overflow:hidden; margin:0 auto 1.4rem auto;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .value-icon-panel svg{ width:92%; height:72%; display:block; }
+    .value-icon-panel .icon-shine{
+        position:absolute; top:0; left:0; width:32%; height:100%;
+        background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.9) 50%, transparent 100%);
+        transform:translateX(-220%);
+        animation:iconShineSweep 5.5s ease-in-out infinite;
+        pointer-events:none;
+    }
+    @keyframes iconShineSweep{
+        0%{ transform:translateX(-220%); }
+        18%{ transform:translateX(-220%); }
+        45%{ transform:translateX(280%); }
+        100%{ transform:translateX(280%); }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .value-icon-panel .icon-shine{ animation:none; opacity:0; }
+    }
+
     /* ---------- Mobile: Kreisgrafik-Labels bekommen alle einen Hintergrund und rücken
        näher an ihren Kreis heran (leichtes Überlappen), damit nichts mehr "verschluckt" wird ---------- */
     @media (max-width:767px){
@@ -606,19 +633,71 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="glass-card rounded-2xl p-7 reveal">
-                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">💡</div>
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradInno" x1="0" y1="0" x2="260" y2="90" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#7cc016"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M60 45 C 90 20, 118 20, 140 32" stroke="url(#gradInno)" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M60 45 C 90 55, 113 62, 138 55" stroke="url(#gradInno)" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+                            <circle cx="40" cy="45" r="10" fill="url(#gradInno)"/>
+                            <g stroke="url(#gradInno)" stroke-width="4" stroke-linecap="round">
+                                <line x1="151" y1="19" x2="169" y2="7"/>
+                                <line x1="161" y1="30" x2="184" y2="21"/>
+                                <line x1="166" y1="45" x2="192" y2="45"/>
+                                <line x1="161" y1="60" x2="184" y2="69"/>
+                                <line x1="151" y1="71" x2="169" y2="83"/>
+                            </g>
+                            <circle cx="150" cy="45" r="17" fill="url(#gradInno)" opacity="0.15"/>
+                            <circle cx="150" cy="45" r="9" fill="url(#gradInno)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:0s"></div>
+                    </div>
                     <h3 class="text-lg font-black text-slate-900 mb-2">Innovation</h3>
-                    <p class="text-sm text-slate-600 leading-relaxed">Erhalten Sie zahlreiche unabhängige Lösungsansätze für reale Fragestellungen – entwickelt von Studierenden mehrerer Hochschulen mit Unterstützung modernster KI.</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">Erhalten Sie <strong class="text-emerald-600 font-bold">zahlreiche unabhängige Lösungsansätze</strong> für reale Fragestellungen – entwickelt von Studierenden mehrerer Hochschulen mit Unterstützung <strong class="text-emerald-600 font-bold">modernster KI</strong>.</p>
                 </div>
                 <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.05s">
-                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">🎓</div>
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradTal" x1="0" y1="90" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#5fa012"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M20 70 C 70 70, 70 45, 110 45 C 150 45, 150 22, 190 22 C 210 22, 220 15, 235 12"
+                                  stroke="url(#gradTal)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 10"/>
+                            <circle cx="20" cy="70" r="7" fill="url(#gradTal)"/>
+                            <circle cx="110" cy="45" r="9" fill="url(#gradTal)"/>
+                            <circle cx="190" cy="22" r="11" fill="url(#gradTal)"/>
+                            <circle cx="235" cy="12" r="13" fill="url(#gradTal)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:1.1s"></div>
+                    </div>
                     <h3 class="text-lg font-black text-slate-900 mb-2">Talente</h3>
-                    <p class="text-sm text-slate-600 leading-relaxed">Lernen Sie zukünftige Fach- und Führungskräfte bereits während ihrer Projektarbeit kennen und gewinnen Sie Zugang zu den klügsten Köpfen von morgen.</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">Lernen Sie <strong class="text-emerald-600 font-bold">zukünftige Fach- und Führungskräfte</strong> bereits während ihrer Projektarbeit kennen und gewinnen Sie Zugang zu den <strong class="text-emerald-600 font-bold">klügsten Köpfen von morgen</strong>.</p>
                 </div>
                 <div class="glass-card rounded-2xl p-7 reveal" style="transition-delay:.1s">
-                    <div class="w-12 h-12 rounded-xl bg-lime-50 flex items-center justify-center text-2xl mb-5">🤝</div>
+                    <div class="value-icon-panel">
+                        <svg viewBox="0 0 260 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gradPart" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#7cc016"/>
+                                    <stop offset="1" stop-color="#22b56b"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="70" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5"/>
+                            <circle cx="130" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5" opacity="0.85"/>
+                            <circle cx="190" cy="45" r="28" stroke="url(#gradPart)" stroke-width="3.5" opacity="0.7"/>
+                            <circle cx="130" cy="45" r="4" fill="url(#gradPart)"/>
+                        </svg>
+                        <div class="icon-shine" style="animation-delay:2.2s"></div>
+                    </div>
                     <h3 class="text-lg font-black text-slate-900 mb-2">Partnerschaften</h3>
-                    <p class="text-sm text-slate-600 leading-relaxed">Knüpfen Sie langfristige Verbindungen zu Hochschulen, Lehrstühlen und Forschungseinrichtungen – als Grundlage für gemeinsame Projekte, Forschung und Innovation.</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">Knüpfen Sie <strong class="text-emerald-600 font-bold">langfristige Verbindungen</strong> zu Hochschulen, Lehrstühlen und Forschungseinrichtungen – als Grundlage für <strong class="text-emerald-600 font-bold">gemeinsame Projekte, Forschung und Innovation</strong>.</p>
                 </div>
             </div>
         </div>
