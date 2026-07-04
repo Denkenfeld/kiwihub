@@ -287,6 +287,27 @@
         .circle-node.main-node .node-label{ font-size:.95rem; }
     }
 
+    /* ---------- Mobile: Kreisgrafik-Labels bekommen alle einen Hintergrund und rücken
+       näher an ihren Kreis heran (leichtes Überlappen), damit nichts mehr "verschluckt" wird ---------- */
+    @media (max-width:767px){
+        .circle-node .node-inner{ gap:0; }
+        .node-label{
+            margin-top:-10px;
+            background:#fff7d6;
+            border:1.5px solid #bef264;
+            padding:2px 8px;
+            border-radius:9999px;
+            position:relative;
+            z-index:8;
+            font-size:.62rem;
+            white-space:nowrap;
+        }
+        .circle-node.main-node .node-label{
+            margin-top:-12px;
+            font-size:.68rem;
+        }
+    }
+
     /* ---------- Timeline ---------- */
     .timeline-dot{
         width:14px; height:14px; border-radius:9999px;
@@ -309,6 +330,12 @@
     .hanging-sign-center-mobile{
         position:absolute; left:0; top:100%;
         z-index:40;
+    }
+    /* Gummiband + Badge sollen links (bei x=0, wo die Logo-Kurve beginnt) hängen,
+       statt unter der Mitte des gesamten Schilds zentriert zu sein. */
+    .hanging-sign-center-mobile .hanging-sign,
+    .hanging-sign-center-mobile .sign-link{
+        align-items:flex-start;
     }
     /* Äußerer Rahmen: nur fürs Einblenden zuständig, damit Zentrierung nie verrutscht */
     .hanging-sign{
@@ -557,11 +584,6 @@
                 </p>
             </div>
             </div>
-
-            <p class="text-center text-base sm:text-lg text-slate-600 font-medium max-w-3xl mx-auto reveal">
-                Eine einzige Herausforderung kann gleichzeitig an mehreren Hochschulen bearbeitet werden –
-                und führt zu <strong class="text-slate-800">neuen Ideen, Talenten und Innovationen</strong>.
-            </p>
         </div>
     </section>
 
@@ -673,23 +695,23 @@
                 <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-6">Industriepartner</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div class="glass-card rounded-2xl overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="NovaTech Industries" class="w-full h-40 object-cover">
+                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="Industriepartner 1" class="w-full h-40 object-cover">
                         <div class="p-5">
-                            <p class="font-black text-slate-900">NovaTech Industries</p>
+                            <p class="font-black text-slate-900">Industriepartner 1 GmbH</p>
                             <p class="text-sm text-slate-500">Automatisierung &amp; Robotik</p>
                         </div>
                     </div>
                     <div class="glass-card rounded-2xl overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80" alt="GreenLogix AG" class="w-full h-40 object-cover">
+                        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80" alt="Industriepartner 2" class="w-full h-40 object-cover">
                         <div class="p-5">
-                            <p class="font-black text-slate-900">GreenLogix AG</p>
+                            <p class="font-black text-slate-900">Industriepartner 2 AG</p>
                             <p class="text-sm text-slate-500">Nachhaltige Logistik</p>
                         </div>
                     </div>
                     <div class="glass-card rounded-2xl overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80" alt="Quantifera Solutions" class="w-full h-40 object-cover">
+                        <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80" alt="Industriepartner 3" class="w-full h-40 object-cover">
                         <div class="p-5">
-                            <p class="font-black text-slate-900">Quantifera Solutions</p>
+                            <p class="font-black text-slate-900">Industriepartner 3 SE</p>
                             <p class="text-sm text-slate-500">Data Analytics &amp; KI</p>
                         </div>
                     </div>
@@ -704,21 +726,21 @@
                         <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80" alt="Lehrstuhl für Maschinelles Lernen" class="w-full h-40 object-cover">
                         <div class="p-5">
                             <p class="font-black text-slate-900">Lehrstuhl für Maschinelles Lernen</p>
-                            <p class="text-sm text-slate-500">TU Berlin</p>
+                            <p class="text-sm text-slate-500">Technische Universität Stadt1</p>
                         </div>
                     </div>
                     <div class="glass-card rounded-2xl overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1606206873764-fd15e242df52?w=800&q=80" alt="Lehrstuhl für Nachhaltige Produktionstechnik" class="w-full h-40 object-cover">
                         <div class="p-5">
                             <p class="font-black text-slate-900">Lehrstuhl für Nachhaltige Produktionstechnik</p>
-                            <p class="text-sm text-slate-500">Universität Stuttgart</p>
+                            <p class="text-sm text-slate-500">Universität Stadt2</p>
                         </div>
                     </div>
                     <div class="glass-card rounded-2xl overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80" alt="Lehrstuhl für Human-Centered AI" class="w-full h-40 object-cover">
                         <div class="p-5">
                             <p class="font-black text-slate-900">Lehrstuhl für Human-Centered AI</p>
-                            <p class="text-sm text-slate-500">Universität Mannheim</p>
+                            <p class="text-sm text-slate-500">Universität Stadt3</p>
                         </div>
                     </div>
                 </div>
@@ -758,7 +780,7 @@
     <section id="cta" class="relative w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28 bg-gradient-to-br from-lime-400 to-emerald-500 overflow-hidden">
         <canvas id="cta-synapse-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
         <div class="relative z-10 max-w-3xl mx-auto text-center reveal">
-            <h2 class="text-3xl sm:text-5xl font-black text-[#0d1a0a] leading-tight mb-5">Werden Sie Gründungspartner von KiwiHub.</h2>
+            <h2 class="text-3xl sm:text-5xl font-black text-[#0d1a0a] leading-tight mb-5">Werden Sie Gründungspartner von kiwihub.</h2>
             <p class="text-lg text-[#0d1a0a]/80 font-medium mb-10">Gestalten Sie mit uns die Zukunft der Zusammenarbeit zwischen Industrie und Hochschulen.</p>
             <a href="#" class="inline-flex items-center gap-2 bg-[#0d1a0a] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#182b16] transition-colors shadow-lg shadow-black/10">
                 Jetzt Challenge starten <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -769,7 +791,7 @@
     <!-- FOOTER -->
     <footer class="w-full border-t border-slate-200 bg-white py-10 text-sm text-slate-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="font-semibold text-slate-600">KiwiHub — Europas KI-Innovationsökosystem für Unternehmen und Hochschulen.</p>
+            <p class="font-semibold text-slate-600">kiwihub — Europas KI-Innovationsökosystem für Unternehmen und Hochschulen.</p>
             <div class="flex gap-6 font-semibold">
                 <a href="#" class="hover:text-lime-600 transition">Impressum</a>
                 <a href="#" class="hover:text-lime-600 transition">Datenschutz</a>
