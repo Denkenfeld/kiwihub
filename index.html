@@ -238,6 +238,11 @@
         .word-list{ animation:none; }
     }
 
+    /* Mobile: großen grünen Kreis hinter der Kreisgrafik entfernen, gelbe Blobs bleiben */
+    @media (max-width:767px){
+        #circle-kiwi-slice{ display:none; }
+    }
+
     .circle-node{
         position:absolute; transform:translate(-50%,-50%);
         width:100px; z-index:5;
